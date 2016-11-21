@@ -1,7 +1,8 @@
 package common
 
 import (
-	"best/wxshop/logs"
+	"best/p2-customer-service/config"
+	"best/p2-customer-service/logs"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -29,8 +30,8 @@ type CaptchaResult struct {
 }
 
 func ApiGetCaptchaKey(c echo.Context) error {
-	// serviceUrl := config.UrlCaptcha + "/get_key"
-	serviceUrl := "http://139.196.228.246:9094/captcha/get_key"
+	serviceUrl := config.UrlCaptcha + "/get_key"
+	// serviceUrl := "http://139.196.228.246:9094/captcha/get_key"
 	logs.Debug.Println(serviceUrl)
 	result := &CaptchaResult{}
 	_, _, err := goreq.New().Get(serviceUrl).BindBody(result).SetCurlCommand(true).End()

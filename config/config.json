@@ -1,0 +1,143 @@
+{
+	"DB": {
+		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+	},
+	"Mongo": {
+		"Conn": "139.196.228.246:27017"
+	},
+	"Contents": {
+		"ServiceHost": "139.196.228.246",
+		"Port": "5001",
+		"CouponApiPrefix": "api/v2/CouponContents"
+	},
+	"Adapter": {
+		"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
+		"CustomerInterfaceApi": "http://222.126.166.31:5002/api/v1/Customers"
+	},
+	"UserInfoQueue":{
+		"ServiceHost": "139.224.20.10",
+		"Port": "8004",
+		"ApiPrefix": "api/v1/user/UserSave"
+	},
+	"TaskQueue":{
+		"Broker": "redis://10.202.101.52:6379"
+	},
+	"CaptchaService":{
+		"ServiceHost": "139.196.228.246",
+		"Port": "9094",
+		"ApiPrefix": "captcha"
+	},
+	"MhService": {
+		"ServiceHost": "222.126.161.59",
+		"Port": "8093",
+		"MemberApiPrefix": "ws_member.asmx"
+	},
+	"FrontDomain": {
+		"Fashion": "http://fashion-wxshop.accurate9.com:3000",
+		"RC":"http://fashion-wxshop-rc.accurate9.com:3000"
+	},
+	"Marketing": {
+		"EventCoupon": "http://10.202.101.17:5700"
+	},
+	"EE":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://ee.accurate9.com/check_we/return_view"
+	},
+	"TT":{
+		"AppId" : "wx41d9d6b81994eb90",
+		"AppSecret" : "16871fa147e56d23757c03f919956d7e",
+		"RedirectUrl" :"http://tt.accurate9.com:9090/check_we/return_view"
+	},
+	"FO":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://fo.accurate9.com/check_we/return_view"
+	},
+	"PC":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://pc.accurate9.com/check_we/return_view"
+	},
+	"RC":{
+		"AppId" : "wx41d9d6b81994eb90",
+		"AppSecret" : "16871fa147e56d23757c03f919956d7e",
+		"RedirectUrl" :"http://rc.accurate9.com:9090/check_we/return_view"
+	},
+	"EK":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://ek.accurate9.com:9090/check_we/return_view"
+	},
+	"PO":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://po.accurate9.com:9090/check_we/return_view"
+	},
+	"SF":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://sf.accurate9.com:9090/check_we/return_view"
+	},
+	"SM":{
+		"AppId" : "wx624042f8ae63df25",
+		"AppSecret" : "7215f7adb0bd0628b49af43d430e4d9d",
+		"RedirectUrl" :"http://sm.accurate9.com:9090/check_we/return_view"
+	},
+	"PR":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://pr.accurate9.com:9090/check_we/return_view"
+	},
+	"CZ":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://cz.accurate9.com:9090/check_we/return_view"
+	},
+	"MH":{
+		"AppId" : "wx41d9d6b81994eb90",
+		"AppSecret" : "16871fa147e56d23757c03f919956d7e",
+		"RedirectUrl" :"http://tt.accurate9.com:9090/check_we/return_view"
+	},
+	"EC":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://cz.accurate9.com:9090/check_we/return_view"
+	},
+	"MH":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://tt.accurate9.com:9092/check_we/return_view"
+	},
+	"EH":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://eh.accurate9.com:9090/check_we/return_view"
+	},
+	"BC":{
+		"AppId" : "wx069381d85f903bab",
+		"AppSecret" : "28c50f523f0cf82a490c78a06b7623d3",
+		"RedirectUrl" :"http://bc.accurate9.com:9090/check_we/return_view"		
+	},
+	"WA":{
+		"AppId" : "wx2a84ddb938612793",
+		"AppSecret" : "35d05b822cddf0648e6eb7395f461984",
+		"RedirectUrl" :"http://wa.accurate9.com:9090/check_we/return_view"		
+	},
+	"NC":{
+		"AppId" : "wx7682c68d32016d13",
+		"AppSecret" : "0fee88822052a149ceb834d81b90fbfc",
+		"RedirectUrl" :"http://nc.accurate9.com:9090/check_we/return_view"		
+	},
+	"CO":{
+		"AppId" : "",
+		"AppSecret" : "",
+		"RedirectUrl" :"http://co.accurate9.com:9090/check_we/return_view"
+	},
+	"MD":{
+		"AppId" : "wxddf5b9a0c9dc6551",
+		"AppSecret" : "ef7da2b7ed300d4628cc1bea53149491",
+		"RedirectUrl" :"http://md.accurate9.com:9090/check_we/return_view"
+	}
+}
+  

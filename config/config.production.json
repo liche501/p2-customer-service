@@ -1,0 +1,118 @@
+{
+	"DB": {
+		"Conn": "elanduser:Eland123@tcp(rm-uf697cmu717ius9i3.mysql.rds.aliyuncs.com:3306)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+	},
+	"Mongo": {
+		"Conn": "mongodb://root:eland123@139.196.177.202:3717,139.196.177.202:3718/admin?replicaSet=mgset-1110705"
+	},
+	"Contents": {
+		"ServiceHost": "nginx",
+		"Port": "81",
+		"CouponApiPrefix": "coupon/api/v2/CouponContents"
+	},
+	"Adapter": {
+		"CslWebService": "http://ewifprd.accurate9.com/CustomerServiceWS.asmx",
+		"CustomerInterfaceApi": "http://139.224.20.10:5002/api/v1/Customers"
+	},
+	"TaskQueue": {
+		"Broker": "redis://Eland123@092c45b530344812.m.cnsha.kvstore.aliyuncs.com:6379"
+	},
+	"CaptchaService":{
+		"ServiceHost": "139.196.228.246",
+		"Port": "9094",
+		"ApiPrefix": "captcha"
+	},
+	"MhService": {
+		"ServiceHost": "222.126.161.47",
+		"Port": "8093",
+		"MemberApiPrefix": "ws_member.asmx"
+	},
+	"FrontDomain": {
+		"Fashion": "http://fashion-wxshop.p2shop.cn",
+		"RC": "http://fashion-wxshop.p2shop.cn"
+	},
+	"Marketing": {
+		"EventCoupon": "https://gateway.p2shop.cn/event-coupon-service"
+	},
+	"EE":{
+		"AppId" : "wx38db2bfbb79a3cea",
+		"AppSecret" : "6c09ba369a4228a10a51c43c6b52e4ab",
+		"RedirectUrl" :"http://ee.elandsystems.com.cn/check_we/return_view"
+	},
+	"TT":{
+		"AppId" : "wx501e73fe52ca9f95",
+		"AppSecret" : "0ccf670f54132775afbd0414f930a84e",
+		"RedirectUrl" :"http://tt.elandsystems.com.cn/check_we/return_view"
+	},
+	"FO":{
+		"AppId" : "wx0805bb426a698549",
+		"AppSecret" : "8b9a645254c8413e35d307b13ebdebcb",
+		"RedirectUrl" :"http://fo.elandsystems.com.cn/check_we/return_view"
+	},
+	"PC":{
+		"AppId" : "wxcade82aee8dd332c",
+		"AppSecret" : "6f632764f4c8d6562c3d4bb10b52cf0b",
+		"RedirectUrl" :"http://pc.elandsystems.com.cn/check_we/return_view"
+	},
+	"RC":{
+		"AppId" : "wx991f846a8cf5a771",
+		"AppSecret" : "5d39d16bc0ee7a0f48a0f2c5ef6620ea",
+		"RedirectUrl" :"http://rc.elandsystems.com.cn/check_we/return_view"
+	},
+	"EK":{
+		"AppId" : "wx9e3b553dee6d32d1",
+		"AppSecret" : "2859d18496b93f6e91f6775383b233b1",
+		"RedirectUrl" :"http://ek.elandsystems.com.cn/check_we/return_view"
+	},
+	"PO":{
+		"AppId" : "wx06925c32fb8f6eaf",
+		"AppSecret" : "cd6bff9aaf96c44e44bfeca40aef3380",
+		"RedirectUrl" :"http://po.elandsystems.com.cn/check_we/return_view"
+	},
+	"SF":{
+		"AppId" : "wx0911d9e4a4894818",
+		"AppSecret" : "342b482cbf864f8f86cd85890963e022",
+		"RedirectUrl" :"http://sf.elandsystems.com.cn/check_we/return_view"
+	},
+	"SM":{
+		"AppId" : "wx28d5dc62f26e173e",
+		"AppSecret" : "069916fe682c97bfc4ce130274a9c340",
+		"RedirectUrl" :"http://sm.elandsystems.com.cn/check_we/return_view"
+	},
+	"PR":{
+		"AppId" : "wxee68d0041c8bf17d",
+		"AppSecret" : "8b3215083e398fa4325c78fd718b0260",
+		"RedirectUrl" :"http://pr.elandsystems.com.cn/check_we/return_view"
+	},
+	"CZ":{
+		"AppId" : "wx64b3794fa743b0fa",
+		"AppSecret" : "b486415053b84c366372f0893d209fb3",
+		"RedirectUrl" :"http://cz.elandsystems.com.cn/check_we/return_view"
+	},
+	"MH":{
+		"AppId" : "wx1bd6b20bdb2cb0c6",
+		"AppSecret" : "67f18963957ff66dbf1ac7515aeb72f2",
+		"RedirectUrl" :"http://mh.elandsystems.com.cn/check_we/return_view"
+	},
+	"EC":{
+		"AppId" : "wx6d369a2e3c8c1175",
+		"AppSecret" : "18d4ebf739ca30ca7314c1c865cf12da",
+		"RedirectUrl" :"http://ec.elandsystems.com.cn/check_we/return_view"		
+	},
+	"EH":{
+		"AppId" : "wxb773087399edd80c",
+		"AppSecret" : "539fa421131ee588835068d0165186a4",
+		"RedirectUrl" :"http://eh.elandsystems.com.cn/check_we/return_view"
+	},
+	"BC":{
+		"AppId" : "wxa15a1456c7cc0a21",
+		"AppSecret" : "c42d1318e4713ff19b630fc5d86da162",
+		"RedirectUrl" :"http://bc.elandsystems.com.cn/check_we/return_view"		
+	},
+	"NC":{
+		"AppId" : "wxc36435bdbbad8f05",
+		"AppSecret" : "38ad9eb77154ea3b77ff94978ad20f0a",
+		"RedirectUrl" :"http://nc.elandsystems.com.cn/check_we/return_view"		
+	}
+}
+  

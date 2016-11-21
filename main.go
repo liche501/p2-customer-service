@@ -47,6 +47,7 @@
 package main
 
 import (
+	"best/p2-customer-service/config"
 	"fmt"
 	"net/http"
 
@@ -88,6 +89,7 @@ func main() {
 		}
 	})
 	RouterInit()
+	config.InitConfig()
 
 	// e.Logger.Fatal(e.Start(":9000"))
 	e.Start(":9000")

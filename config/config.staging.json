@@ -1,0 +1,40 @@
+{
+	"DB": {
+		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+	},
+	"Contents": {
+		"ServiceHost": "139.196.228.246",
+		"Port": "5001",
+		"CouponApiPrefix": "api/v2/CouponContents"
+	},
+	"Adapter": {
+		"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
+		"CustomerInterfaceApi": "http://222.126.166.31:5002/api/v1/Customers"
+	},
+	"TaskQueue":{
+		"Broker": "redis://139.196.228.246:6379"
+	},
+	"FrontDomain": {
+		"Fashion": "http://fashion-wxshop.accurate9.com",
+		"RC": "http://fashion-wxshop-rc.accurate9.com"
+	},
+	"TT":{
+		"AppId" : "wx41d9d6b81994eb90",
+		"AppSecret" : "16871fa147e56d23757c03f919956d7e",
+		"RedirectUrl" :"http://tt.accurate9.com:9090/check_we/return_view"
+	},
+	"BC":{
+		"AppId" : "wx069381d85f903bab",
+		"AppSecret" : "28c50f523f0cf82a490c78a06b7623d3",
+		"RedirectUrl" :"http://bc.accurate9.com:9090/check_we/return_view"
+	},
+	"CaptchaService":{
+		"ServiceHost": "10.173.208.142",
+		"Port": "9094",
+		"ApiPrefix": "captcha"
+	},
+	"Marketing": {
+		"EventCoupon": "http://staging.p2shop.cn:40100"
+	}
+}
+  
