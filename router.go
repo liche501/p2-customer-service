@@ -40,7 +40,7 @@ func RouterInit() {
 		return echo.NewHTTPError(http.StatusInternalServerError, "10003", " error01")
 	})
 	e.GET("/error2", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, apiResult{Error: apiError{Code: http.StatusBadRequest, Message: "StatusBadRequest"}})
+		return c.JSON(http.StatusOK, apiResult{Error: apiError{Code: 10001, Message: "StatusBadRequest"}})
 	})
 
 	// Restricted group
@@ -81,9 +81,9 @@ func RouterInit() {
 	s.GET("/ative", demo)
 
 	p := c.Group("/captcha")
-	p.GET("/get_key", common.ApiGetCaptchaKey)
-	p.GET("/get_image", demo)
-	p.GET("/check", demo)
+	p.GET("/key", common.ApiGetCaptchaKey)
+	p.GET("/image/:key", demo)
+	p.GET("/success/:key/:code", demo)
 
 	a := c.Group("/auth")
 	a.GET("/set_auth", demo)
