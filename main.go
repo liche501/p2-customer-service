@@ -66,7 +66,7 @@ func main() {
 		Format: "method=${method}, uri=${uri}, status=${status}, latency=${latency}\n",
 	}))
 	e.Use(middleware.Recover())
-	e.Use(middleware.CSRF())
+	// e.Use(middleware.CSRF())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

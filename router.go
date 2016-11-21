@@ -2,30 +2,17 @@ package main
 
 import (
 	"best/p2-customer-service/api/common"
+	. "best/p2-customer-service/dto"
+	"best/p2-customer-service/extends"
+
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-)
-
-type (
-	apiResult struct {
-		Result  interface{} `json:"result"`
-		Success bool        `json:"success"`
-		Error   apiError    `json:"error"`
-	}
-
-	apiError struct {
-		Code    int         `json:"code"`
-		Details interface{} `json:"details"`
-		Message string      `json:"message"`
-	}
 )
 
 func RouterInit() {
 	// Login route
 	e.POST("/login", login)
-
 	// Unauthenticated route
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "accessible")
@@ -34,19 +21,24 @@ func RouterInit() {
 		return c.String(http.StatusOK, "pong")
 	})
 	e.GET("/success", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, apiResult{Success: true, Result: "aaaaaaa"})
+		return c.JSON(http.StatusOK, APIResult{Success: true, Result: "aaaaaaa"})
 	})
 	e.GET("/error", func(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "10003", " error01")
 	})
 	e.GET("/error2", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, apiResult{Error: apiError{Code: 10001, Message: "StatusBadRequest"}})
+		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 10001, Message: "StatusBadRequest"}})
 	})
 
-	// Restricted group
-	r := e.Group("/restricted")
-	r.Use(middleware.JWT([]byte("secret")))
-	r.GET("", restricted)
+	e.GET("/token", func(c echo.Context) error {
+		token, _ := extends.AuthHandler("rc", "openid_111111111", "13691194223", "cust_1000")
+		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
+	})
+	t := e.Group("/jwt")
+	// t.Use(extends.JWTMiddleware)
+	t.GET("", extends.JWTMiddleware(func(c echo.Context) error {
+		return c.JSON(http.StatusOK, c.Get("openIdWithToken"))
+	}))
 
 	api := e.Group("/api")
 	v1 := api.Group("/v1")
@@ -81,7 +73,7 @@ func RouterInit() {
 	s.GET("/ative", demo)
 
 	p := c.Group("/captcha")
-	p.GET("/key", common.ApiGetCaptchaKey)
+	p.GET("/key", common.APIGetCaptchaKey)
 	p.GET("/image/:key", demo)
 	p.GET("/success/:key/:code", demo)
 

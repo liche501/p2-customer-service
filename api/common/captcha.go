@@ -2,25 +2,14 @@ package common
 
 import (
 	"best/p2-customer-service/config"
+	. "best/p2-customer-service/dto"
+
 	"best/p2-customer-service/logs"
+
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/smallnest/goreq"
-)
-
-type (
-	apiResult struct {
-		Result  interface{} `json:"result"`
-		Success bool        `json:"success"`
-		Error   apiError    `json:"error"`
-	}
-
-	apiError struct {
-		Code    int         `json:"code"`
-		Details interface{} `json:"details"`
-		Message string      `json:"message"`
-	}
 )
 
 type CaptchaResult struct {
@@ -29,18 +18,18 @@ type CaptchaResult struct {
 	Key      string `json:"key"`
 }
 
-func ApiGetCaptchaKey(c echo.Context) error {
-	serviceUrl := config.UrlCaptcha + "/get_key"
-	// serviceUrl := "http://139.196.228.246:9094/captcha/get_key"
-	logs.Debug.Println(serviceUrl)
+func APIGetCaptchaKey(c echo.Context) error {
+
+	serviceURL := config.UrlCaptcha + "/get_key"
+	// serviceURL := "http://139.196.228.246:9094/captcha/get_key"
+	logs.Debug.Println(serviceURL)
 	result := &CaptchaResult{}
-	_, _, err := goreq.New().Get(serviceUrl).BindBody(result).SetCurlCommand(true).End()
+	_, _, err := goreq.New().Get(serviceURL).BindBody(result).SetCurlCommand(true).End()
 	if err != nil {
 		logs.Error.Println("Get captcha key error: ", err)
 		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003, err[0].Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err[0].Error())
-
 	}
-	return c.JSON(http.StatusOK, apiResult{Success: true, Result: result})
+	return c.JSON(http.StatusOK, APIResult{Success: true, Result: result})
 	// extends.ReturnJsonSuccess(w, http.StatusOK, map[string]string{"key": result.Key})
 }

@@ -32,7 +32,6 @@ var Config = struct {
 		CustomerInterfaceApi string
 	}
 
-
 	UserInfoQueue struct {
 		ServiceHost string
 		Port        string
@@ -54,102 +53,6 @@ var Config = struct {
 
 	Marketing struct {
 		EventCoupon string
-	}
-
-	EE struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	TT struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	FO struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	PC struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	RC struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	EK struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	PO struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	SF struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	SM struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	PR struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	CZ struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	MH struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	EH struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	EC struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	BC struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	WA struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	NC struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	CO struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
-	}
-	MD struct {
-		AppId       string
-		AppSecret   string
-		RedirectUrl string
 	}
 }{}
 
