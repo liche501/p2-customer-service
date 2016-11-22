@@ -4,13 +4,12 @@ import (
 	"best/p2-customer-service/config"
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/logs"
+	"best/p2-customer-service/model"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
-	"wxshop/extends"
-	"wxshop/models"
 
 	"github.com/labstack/echo"
 	"github.com/smallnest/goreq"
@@ -45,7 +44,7 @@ func ApiSendSms(c echo.Context) error {
 	}
 	verCode := createVerCode()
 	smsStr := &SmsResult{}
-	url := config.Config.Adapter.CustomerInterfaceApi + "?telephoneNumber=" + mobile + "&verCode=" + verCode
+	url := config.Config.Adapter.CSL.CustomerInterfaceAPI + "?telephoneNumber=" + mobile + "&verCode=" + verCode
 	_, _, err := goreq.New().Get(url).BindBody(smsStr).SetCurlCommand(true).End()
 	if err != nil {
 		logs.Error.Println("Call sms api error: ", err)
@@ -61,7 +60,7 @@ func ApiSendSms(c echo.Context) error {
 	}
 	msg := fmt.Sprintf("SMS %v %v %v ", brandCode, mobile, smsStr.Data.SmsCode)
 	logs.Succ.Println(msg)
-	var sms models.Sms
+	var sms model.Sms
 	sms.BrandCode = brandCode
 	sms.Mobile = mobile
 	sms.VerCode = smsStr.Data.SmsCode
@@ -73,20 +72,23 @@ func ApiSendSms(c echo.Context) error {
 
 func ApiCheckSms(c echo.Context) error {
 	// Verify SmsCode
-	var sms models.Sms
-	mobile := r.FormValue("mobile")
-	verCode := r.FormValue("verCode")
+	var sms model.Sms
+	mobile := c.FormValue("mobile")
+	verCode := c.FormValue("verCode")
 	if mobile == "" || verCode == "" {
-		extends.ReturnJsonFailure(w, http.StatusBadRequest, 10012)
-		return
+		//extends.ReturnJsonFailure(w, http.StatusBadRequest, 10012)
+		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
 	result, err := sms.CheckVerCode(mobile, verCode)
 	if err != nil {
 		logs.Error.Println("Check sms error: ", err)
-		extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10013)
-		return
+		// //extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10013)
+		// return
+
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
-	extends.ReturnJsonSuccess(w, http.StatusOK, map[string]bool{"flag": result})
+	return c.JSON(http.StatusOK, APIResult{Success: true, Result: map[string]bool{"flag": result}})
+	//extends.ReturnJsonSuccess(w, http.StatusOK, map[string]bool{"flag": result})
 }
 
 var smsChannel chan int64 = make(chan int64, 32)
@@ -117,6 +119,7 @@ func Active(c echo.Context) error {
 
 	aa := createVerCode()
 	logs.Succ.Println(aa)
+	return nil
 }
 func createVerCode() string {
 	verCode := ""
@@ -140,7 +143,7 @@ func cutRandomCode() string {
 }
 
 func checkRepeatSms(verCode string) bool {
-	var sms models.Sms
+	var sms model.Sms
 	result, err := sms.CheckRepeatVerCode(verCode)
 	if err != nil {
 		logs.Error.Println("CheckRepeatVerCode sms error: ", err)
