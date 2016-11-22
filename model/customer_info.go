@@ -35,7 +35,7 @@ func (u *CustomerInfo) Save() error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	exist, err := CustomerInfo{}.Get(u.Mobile, u.BrandCode)
+	exist, err := CustomerInfo{}.Get(u.BrandCode, u.Mobile)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (u *CustomerInfo) Save() error {
 	return nil
 }
 
-func (CustomerInfo) Get(mobile, brandCode string) (*CustomerInfo, error) {
+func (CustomerInfo) Get(brandCode, mobile string) (*CustomerInfo, error) {
 	user := CustomerInfo{}
 	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&user)
 	if err != nil {
