@@ -1,6 +1,6 @@
 {
 	"DB": {
-		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+		"Conn": "root:123456@tcp(127.0.0.1:3306)/wxshop?charset=utf8&parseTime=True&loc=UTC"
 	},
 	"Coupon": {
 		"Contents": {

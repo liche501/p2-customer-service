@@ -40,3 +40,6 @@ type RetailBrandCustomerInfo struct {
 	Customer            `xorm:"extends"`
 	RetailBrandCustomer `xorm:"extends"`
 }
+
+
+
