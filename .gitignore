@@ -3,11 +3,13 @@
 *.a
 *.so
 *.log
+*.exe
 
 # Folders
 _obj
 _test
 [Ll]og/
+tmp/
 
 # Architecture specific extensions/prefixes
 *.[568vq]
