@@ -44,16 +44,29 @@ func APIRegister(c echo.Context) error {
 	}
 
 	//CheckSms
-	flag, err := model.Sms{}.CheckVerCode(mobile, verCode)
-	if err != nil {
-		logs.Error.Println("Check sms error: ", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	// flag, err := model.Sms{}.CheckVerCode(mobile, verCode)
+	// if err != nil {
+	// 	logs.Error.Println("Check sms error: ", err)
+	// 	return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 
-	} else if !flag {
-		logs.Error.Println("Sms code invalid")
-		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20006, Message: "20006"}})
+	// } else if !flag {
+	// 	logs.Error.Println("Sms code invalid")
+	// 	return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20006, Message: "20006"}})
+
+	// }
+	logs.Debug.Println(brandCode, openId)
+
+	fashionBrandCustomerInfo := new(model.FashionBrandCustomerInfo)
+	fashionBrandCustomerInfo.Customer.Mobile = mobile
+	fashionBrandCustomerInfo.FashionBrandCustomer.BrandCode = brandCode
+	fashionBrandCustomerInfo.FashionBrandCustomer.WxOpenID = openId
+	logs.Debug.Println(fashionBrandCustomerInfo)
+
+	if err := fashionBrandCustomerInfo.Create(); err != nil {
+		logs.Error.Println(err)
 
 	}
+
 	return echo.NewHTTPError(http.StatusBadRequest, 10012)
 
 }
