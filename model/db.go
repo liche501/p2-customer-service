@@ -21,7 +21,6 @@ func InitDB(dialect, conn string) error {
 		db.ShowSQL(true)
 	}
 
-	// return db.Sync2(new(User), new(UserShop), new(Sms), new(UserDetail), new(ErrorUser), new(UserMh))
 	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(CustomerInfo), new(RetailBrandCustomer), new(Sms))
 
 }
