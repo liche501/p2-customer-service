@@ -15,7 +15,7 @@ type Customer struct {
 }
 
 func (Customer) TableName() string {
-	return "user"
+	return "customer"
 }
 
 func (Customer) GetByMobile(mobile string) (*Customer, error) {
@@ -49,7 +49,7 @@ type CustomerInfo struct {
 }
 
 func (CustomerInfo) TableName() string {
-	return "user_detail"
+	return "customer_info"
 }
 
 func (u *CustomerInfo) Save() error {

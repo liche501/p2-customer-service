@@ -2,6 +2,8 @@ package main
 
 import (
 	"best/p2-customer-service/api/common"
+	"best/p2-customer-service/api/fashion"
+
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/extends"
 
@@ -42,16 +44,16 @@ func RouterInit() {
 
 	api := e.Group("/api")
 	v1 := api.Group("/v1")
-	shop := v1.Group("/shop")
+	fa := v1.Group("/fashion")
 
 	//User
-	user := shop.Group("/user")
+	user := fa.Group("/user")
 	user.POST("/register", demo)
 	user.GET("/login", demo)
 	user.GET("/get_customer_info", demo)
 	user.GET("/get_user_info", demo)
 	user.POST("/update_perfect_info", demo)
-	user.GET("/check_mobile", demo)
+	user.GET("/check_mobile", extends.JWTMiddleware(fashion.APICheckMobile))
 	user.GET("/get_member_info", demo)
 
 	//Coupon

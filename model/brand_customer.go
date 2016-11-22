@@ -20,7 +20,7 @@ type FashionBrandCustomer struct {
 }
 
 func (FashionBrandCustomer) TableName() string {
-	return "user_shop"
+	return "fashion_brand_customer"
 }
 
 type RetailBrandCustomer struct {
@@ -36,7 +36,7 @@ type RetailBrandCustomer struct {
 }
 
 func (RetailBrandCustomer) TableName() string {
-	return "user_mh"
+	return "retail_brand_customer"
 }
 
 type FashionBrandCustomerInfo struct {
