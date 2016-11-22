@@ -93,7 +93,25 @@ func (u *FashionBrandCustomerInfo) Create() error {
 		if err := u.Customer.Create(); err != nil {
 			return err
 		}
+		customer.Mobile = u.Customer.Mobile
 		customer.Id = u.Customer.Id
+	}
+
+	// create CustomerInfo
+	customerInfo, err := CustomerInfo{}.Get(u.FashionBrandCustomer.BrandCode, u.Mobile)
+	if err != nil {
+		return err
+	}
+	if customerInfo == nil {
+		customerInfo = &CustomerInfo{
+			CustomerId: customer.Id,
+			Name:       u.FashionBrandCustomer.ReceiveName,
+			Mobile:     customer.Mobile,
+			BrandCode:  u.FashionBrandCustomer.BrandCode,
+		}
+		if err := customerInfo.Save(); err != nil {
+			return err
+		}
 	}
 
 	// create FashionBrandCustomer
