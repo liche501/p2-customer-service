@@ -18,7 +18,7 @@ type FashionBrandCustomer struct {
 	ReceiveName      string `xorm:"'receiv_name'"`
 	ReceiveSize      string `xorm:"'receiv_size'"`
 
-	Status    string    `xorm:"varchar(40)"`
+	Status    string    `xorm:"varchar(40) 'regist_status'"`
 	CreatedAt time.Time `xorm:"created 'in_date_time'"`
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
@@ -156,5 +156,18 @@ func (u *FashionBrandCustomerInfo) UpdateForGame() error {
 
 func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
 
-	return nil, nil
+	u := FashionBrandCustomerInfo{}
+	has, err := db.Where("open_id = ?", wxOpenId).And("brand_code = ?", brandCode).And("regist_status = ?", status).Get(&u.FashionBrandCustomer)
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, nil
+	}
+	has, err = db.Where("id = ?", u.FashionBrandCustomer.CustomerId).Get(&u.Customer)
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, nil
+	}
+	return &u, nil
 }

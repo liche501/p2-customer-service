@@ -49,12 +49,12 @@ func RouterInit() {
 	//User
 	user := fa.Group("/user")
 	user.POST("/register", extends.JWTMiddleware(fashion.APIRegister))
-	user.GET("/login", demo)
-	user.GET("/get_customer_info", demo)
-	user.GET("/get_user_info", demo)
-	user.POST("/update_perfect_info", demo)
+	user.GET("/login", extends.JWTMiddleware(fashion.APILogin))
+	user.GET("/get_customer_info", extends.JWTMiddleware(fashion.APIGetCustomerInfo))
+	user.GET("/get_user_info", extends.JWTMiddleware(fashion.APIGetUserInfo))
+	user.POST("/update_perfect_info", extends.JWTMiddleware(fashion.APIUpdatePerfectInfo))
 	user.GET("/check_mobile", extends.JWTMiddleware(fashion.APICheckMobile))
-	user.GET("/get_member_info", demo)
+	user.GET("/get_member_info", extends.JWTMiddleware(fashion.APIGetMemberInfo))
 
 	//Coupon
 	co := v1.Group("/coupon")
