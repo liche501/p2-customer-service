@@ -135,14 +135,14 @@ func (ud *CustomerInfo) SaveCustomerInfoWithMobile(mobile, oldMobile, openId str
 		}
 
 		// 3修改ModernHouse
-		mh := UserMh{}
+		mh := RetailBrandCustomer{}
 		_, err = db.Where("user_id = ?", user.Id).Delete(&mh)
 		if err != nil {
 			return err
 		}
 
-		mhn := UserMh{}
-		mhn.UserId = user.Id
+		mhn := RetailBrandCustomer{}
+		mhn.CustomerId = user.Id
 		_, err = db.Where("user_id = ?", u.Id).Cols("user_id").Update(&mhn)
 		if err != nil {
 			return err
