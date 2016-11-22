@@ -56,6 +56,42 @@ func TestUserShopCURD(t *testing.T) {
 			})
 		})
 
+		Convey("Change Mobile", func() {
+			i := FashionBrandCustomerInfo{}
+			i.Customer.Mobile = "13161955001"
+			i.FashionBrandCustomer.BrandCode = "tt"
+			i.FashionBrandCustomer.CustNo = "1"
+			i.FashionBrandCustomer.WxOpenID = "oYiR6wV9swnxcaXrEkXDPLzt27Wg111"
+			i.Create()
+
+			i2 := FashionBrandCustomerInfo{}
+			i2.Customer.Mobile = "13161955002"
+			i2.FashionBrandCustomer.BrandCode = "tt"
+			i2.FashionBrandCustomer.CustNo = "2"
+			i2.FashionBrandCustomer.WxOpenID = "oYiR6wV9swnxcaXrEkXDPLzt27Wg211"
+			i2.Create()
+
+			i3 := FashionBrandCustomerInfo{}
+			i3.Customer.Mobile = "13161955003"
+			i3.FashionBrandCustomer.BrandCode = "tt"
+			i3.FashionBrandCustomer.CustNo = "3"
+			i3.FashionBrandCustomer.WxOpenID = "oYiR6wV9swnxcaXrEkXDPLzt27Wg311"
+			i3.Create()
+
+			err := i3.ChangeMobileWithOld("13161955003", "13161955002")
+			So(err, ShouldBeNil)
+
+			c, err := FashionBrandCustomer{}.GetByMobile("tt", "13161955002")
+			So(err, ShouldBeNil)
+			So(c.CustNo == "3", ShouldBeTrue)
+
+			c2, err := Customer{}.Get(i2.CustomerId)
+			So(err, ShouldBeNil)
+			fmt.Println("c2.Mobile:", c2.Mobile)
+			// t.Log(c2.Mobile)
+
+		})
+
 		Convey("UpdatePassword", func() {
 			i := FashionBrandCustomerInfo{}
 			i.Customer.Mobile = "13161955000"
