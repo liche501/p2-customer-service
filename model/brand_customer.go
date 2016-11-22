@@ -7,7 +7,7 @@ type FashionBrandCustomer struct {
 	CustomerId int64 `xorm:"index 'user_id'"`
 	BrandCode  string
 	CustNo     string
-	WxOpenId   string `xorm:"'open_id'"`
+	WxOpenID   string `xorm:"'open_id'"`
 
 	ReceiveAddress   string `xorm:"'receiv_address'"`
 	ReceiveTelephone string `xorm:"'receiv_telephone'"`
@@ -26,7 +26,7 @@ func (FashionBrandCustomer) TableName() string {
 type RetailBrandCustomer struct {
 	Id         int64
 	CustomerId int64  `xorm:"index 'user_id'"`
-	WxOpenId   string `xorm:"'open_id'"`
+	WxOpenID   string `xorm:"'open_id'"`
 	BrandCode  string
 	VipCode    string
 
@@ -47,4 +47,52 @@ type FashionBrandCustomerInfo struct {
 type RetailBrandCustomerInfo struct {
 	Customer            `xorm:"extends"`
 	RetailBrandCustomer `xorm:"extends"`
+}
+
+func (u *FashionBrandCustomerInfo) Create() error {
+	return nil
+}
+
+func (FashionBrandCustomerInfo) Delete(mobile, brandCode string) error {
+	return nil
+}
+func (u *FashionBrandCustomerInfo) UpdateCustNo() error {
+	return nil
+}
+
+func (u *FashionBrandCustomerInfo) UpdatePassword() error {
+	return nil
+}
+
+func (u *FashionBrandCustomerInfo) UpdateForGame() error {
+	return nil
+}
+
+func (FashionBrandCustomerInfo) GetByMobile(mobile, brandCode string) (*FashionBrandCustomer, error) {
+	return nil, nil
+}
+
+func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, openId, status string) (*FashionBrandCustomerInfo, error) {
+
+	return nil, nil
+}
+
+func (FashionBrandCustomer) CheckWxOpenID(brandCode, openId string) (bool, error) {
+	return true, nil
+}
+
+func (u *RetailBrandCustomer) Create() error {
+	return nil
+}
+
+func (RetailBrandCustomer) GetByMobile(mobile, brandCode string) (*RetailBrandCustomer, error) {
+	return nil, nil
+}
+
+func (u RetailBrandCustomer) Delete() error {
+	return nil
+}
+
+func (u *RetailBrandCustomer) UpdateIsOldCust(isOldCust bool) error {
+	return nil
 }
