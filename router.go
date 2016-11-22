@@ -48,7 +48,7 @@ func RouterInit() {
 
 	//User
 	user := fa.Group("/user")
-	user.POST("/register", demo)
+	user.POST("/register", extends.JWTMiddleware(fashion.APIRegister))
 	user.GET("/login", demo)
 	user.GET("/get_customer_info", demo)
 	user.GET("/get_user_info", demo)
