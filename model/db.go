@@ -1,10 +1,16 @@
 package model
 
 import (
+	"errors"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+)
+
+var (
+	CustomerNotExistError          = errors.New("User not exists")
+	BrandCustomerAlreadyExistError = errors.New("BrandCustomer already exists")
 )
 
 var db *xorm.Engine

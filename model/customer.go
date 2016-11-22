@@ -25,7 +25,7 @@ func (Customer) Get(id int64) (*Customer, error) {
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, errors.New("User not exists")
+		return nil, CustomerNotExistError
 	}
 	return &c, nil
 }
@@ -36,14 +36,14 @@ func (Customer) GetByMobile(mobile string) (*Customer, error) {
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, errors.New("User not exists")
+		return nil, CustomerNotExistError
 	}
 	return &c, nil
 }
 
 func (u *Customer) Create() error {
 	exist, err := Customer{}.GetByMobile(u.Mobile)
-	if err != nil {
+	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 

@@ -36,7 +36,7 @@ func (u *CustomerInfo) Save() error {
 	defer mutex.Unlock()
 
 	exist, err := CustomerInfo{}.Get(u.BrandCode, u.Mobile)
-	if err != nil {
+	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 	if exist != nil {
@@ -66,7 +66,7 @@ func (CustomerInfo) Get(brandCode, mobile string) (*CustomerInfo, error) {
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, nil
+		return nil, CustomerNotExistError
 	}
 	return &user, nil
 }

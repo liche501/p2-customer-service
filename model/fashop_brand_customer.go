@@ -36,7 +36,7 @@ func (FashionBrandCustomer) GetByWxOpenID(brandCode, wxOpenID string) (*FashionB
 	}
 
 	if !has {
-		return nil, nil
+		return nil, CustomerNotExistError
 	}
 
 	return &c, nil
@@ -59,7 +59,7 @@ func (FashionBrandCustomer) GetByCustomerID(brandCode string, customerID int64) 
 	}
 
 	if !has {
-		return nil, nil
+		return nil, CustomerNotExistError
 	}
 
 	return &c, nil
@@ -77,31 +77,31 @@ func (u *FashionBrandCustomerInfo) Create() error {
 
 	// return if exist
 	exist, err := FashionBrandCustomer{}.GetByWxOpenID(u.FashionBrandCustomer.BrandCode, u.FashionBrandCustomer.WxOpenID)
-	if err != nil {
+	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 	if exist != nil {
-		return errors.New("BrandCustomer already exists")
+		return BrandCustomerAlreadyExistError
 	}
 
 	// check Customer exist
 	customer, err := Customer{}.GetByMobile(u.Customer.Mobile)
-	if err != nil {
+	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 	if customer == nil {
-		if err := u.Customer.Create(); err != nil {
+		if err := u.Customer.Create(); err != nil && err != CustomerNotExistError {
 			return err
 		}
-		customer.Mobile = u.Customer.Mobile
-		customer.Id = u.Customer.Id
+		customer = &u.Customer
 	}
 
 	// create CustomerInfo
 	customerInfo, err := CustomerInfo{}.Get(u.FashionBrandCustomer.BrandCode, u.Mobile)
-	if err != nil {
+	if err != nil && err != CustomerNotExistError {
 		return err
 	}
+
 	if customerInfo == nil {
 		customerInfo = &CustomerInfo{
 			CustomerId: customer.Id,
@@ -126,7 +126,7 @@ func (u *FashionBrandCustomerInfo) Create() error {
 	return nil
 }
 
-func (FashionBrandCustomerInfo) Delete(customerID int64, brandCode string) error {
+func (FashionBrandCustomerInfo) Delete(brandCode string, customerID int64) error {
 	c, err := FashionBrandCustomer{}.GetByCustomerID(brandCode, customerID)
 	if err != nil {
 		return err
@@ -152,10 +152,6 @@ func (u *FashionBrandCustomerInfo) UpdatePassword() error {
 
 func (u *FashionBrandCustomerInfo) UpdateForGame() error {
 	return nil
-}
-
-func (FashionBrandCustomerInfo) GetByMobile(brandCode, mobile string) (*FashionBrandCustomer, error) {
-	return nil, nil
 }
 
 func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
