@@ -15,7 +15,7 @@ type Customer struct {
 }
 
 func (Customer) TableName() string {
-	return "customer"
+	return "user"
 }
 
 func (Customer) Get(id int64) (*Customer, error) {

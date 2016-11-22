@@ -27,6 +27,33 @@ func TestUserShopCURD(t *testing.T) {
 			if err != BrandCustomerAlreadyExistError {
 				So(err, ShouldBeNil)
 			}
+			Convey("Check Customer", func() {
+				c, err := Customer{}.GetByMobile("13161955000")
+				if err != nil {
+					fmt.Println("GetByMobile error: ", err)
+				} else {
+					fmt.Println("GetByMobile: ", c)
+				}
+				So(err, ShouldBeNil)
+			})
+			Convey("Check CustomerInfo", func() {
+				c, err := CustomerInfo{}.Get("tt", "13161955000")
+				if err != nil {
+					fmt.Println("GetByMobile error: ", err)
+				} else {
+					fmt.Println("GetByMobile: ", c)
+				}
+				So(err, ShouldBeNil)
+			})
+			Convey("Check FashionBrandCustomer", func() {
+				c, err := FashionBrandCustomer{}.GetByMobile("tt", "13161955000")
+				if err != nil {
+					fmt.Println("GetByMobile error: ", err)
+				} else {
+					fmt.Println("GetByMobile: ", c)
+				}
+				So(err, ShouldBeNil)
+			})
 		})
 
 		Convey("UpdatePassword", func() {
