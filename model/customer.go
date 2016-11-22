@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -18,6 +19,18 @@ func (Customer) TableName() string {
 	return "user"
 }
 
+func (Customer) Get(id int64) (*Customer, error) {
+	var c Customer
+	has, err := db.Id(id).Get(&c)
+
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, errors.New("User not exists")
+	}
+	return &c, nil
+}
+
 func (Customer) GetByMobile(mobile string) (*Customer, error) {
 	var c Customer
 	has, err := db.Where("mobile = ?", mobile).Get(&c)
@@ -27,6 +40,71 @@ func (Customer) GetByMobile(mobile string) (*Customer, error) {
 		return nil, errors.New("User not exists")
 	}
 	return &c, nil
+}
+
+func (u *Customer) Create() error {
+	exist, err := Customer{}.GetByMobile(u.Mobile)
+	if err != nil {
+		return err
+	}
+
+	if affected, err := db.InsertOne(u); err != nil {
+		return err
+	} else if affected == 0 {
+		return errors.New("Affected rows : 0")
+	}
+
+	// TODO:: This is illogic. Have to change this logic.
+	if exist != nil {
+		if affected, err := db.Id(exist.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(u.Id, 10)}); err != nil {
+			return err
+		} else if affected == 0 {
+			return errors.New("Affected rows : 0")
+		}
+	}
+	return nil
+}
+
+func (Customer) ChangeMobileWithID(id int64, mobile string) error {
+	exist, _ := Customer{}.GetByMobile(mobile)
+	if exist != nil && exist.Id == id {
+		return nil // do nothing
+	}
+	if exist != nil && exist.Id != id {
+		// TODO:: This is illogic. Have to change this logic.
+		if _, err := db.Id(exist.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(id, 10)}); err != nil {
+			return fmt.Errorf("Cannot change exist mobile: ", err)
+		}
+	}
+
+	affected, err := db.Id(id).Cols("mobile").Update(&Customer{Mobile: mobile})
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("Affected rows : 0")
+	}
+	return nil
+}
+
+func (Customer) ChangeMobileWithOld(oldMobile, newMobile string) error {
+	if oldMobile == newMobile {
+		return nil
+	}
+
+	exist, err := Customer{}.GetByMobile(oldMobile)
+	if err != nil {
+		return err
+	}
+	if exist == nil {
+		return errors.New("Affected rows : 0")
+	}
+
+	if err := (Customer{}.ChangeMobileWithID(exist.Id, newMobile)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type CustomerInfo struct {
@@ -59,23 +137,29 @@ func (u *CustomerInfo) Save() error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	has, err := db.Where("mobile = ?", u.Mobile).And("brand_code = ?", u.BrandCode).Get(&user)
+	exist, err := CustomerInfo{}.Get(u.Mobile, u.BrandCode)
 	if err != nil {
 		return err
-	} else if !has {
-		// Insert
-		affected, err := db.InsertOne(u)
-		if err == nil && affected == 0 {
+	}
+	if exist != nil {
+		affected, err := db.Id(exist.Id).AllCols().Update(u)
+		if err != nil {
+			return err
+		}
+		if affected == 0 {
 			return errors.New("Affected rows : 0")
 		}
-		return err
+		return nil
 	}
 
-	affected, err := db.Where("mobile = ?", u.Mobile).And("brand_code = ?", u.BrandCode).AllCols().Update(u)
-	if err == nil && affected == 0 {
+	affected, err := db.InsertOne(u)
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
 		return errors.New("Affected rows : 0")
 	}
-	return err
+	return nil
 }
 
 func (CustomerInfo) Get(mobile, brandCode string) (*CustomerInfo, error) {
@@ -89,6 +173,11 @@ func (CustomerInfo) Get(mobile, brandCode string) (*CustomerInfo, error) {
 	return &user, nil
 }
 
+func (CustomerInfo) FindByMobile(mobile string) (customers []CustomerInfo, err error) {
+	err = db.Where("mobile = ?", mobile).Find(&customers)
+	return
+}
+
 func (u *CustomerInfo) UpdateHasFilled() error {
 	affected, err := db.Where("mobile = ?", u.Mobile).And("brand_code = ?", u.BrandCode).Cols("has_filled").Update(u)
 	if err == nil && affected == 0 {
@@ -97,88 +186,35 @@ func (u *CustomerInfo) UpdateHasFilled() error {
 	return err
 }
 
-func (ud *CustomerInfo) SaveCustomerInfoWithMobile(mobile, oldMobile, openId string) error {
-	var mutex sync.Mutex
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	user := Customer{}
-	has, err := db.Where("mobile = ?", oldMobile).Get(&user)
-	if err != nil {
-		return err
-	} else if !has {
+func (CustomerInfo) ChangeMobileWithOld(oldMobile, newMobile string) error {
+	if oldMobile == newMobile {
 		return nil
 	}
 
-	// 判断mobile是否已存在
-	u := Customer{}
-	has, err = db.Where("mobile = ?", mobile).Get(&u)
+	if err := (Customer{}.ChangeMobileWithOld(oldMobile, newMobile)); err != nil {
+		return nil
+	}
+
+	// TODO:: This is illogic. Have to remove this logic.
+	c, err := Customer{}.GetByMobile(newMobile)
+	newMobileCustomers, err := CustomerInfo{}.FindByMobile(newMobile)
 	if err != nil {
 		return err
 	}
-	if has {
-		// 1修改主表
-		u.Mobile = strconv.FormatInt(u.Id, 10)
-		affected, err := db.Where("mobile = ?", mobile).Cols("mobile").Update(&u)
-		if err != nil {
-			return err
-		} else if affected == 0 {
-			return errors.New("Affected rows : 0")
-		}
-
-		// 2修改Detail表
-		udn := CustomerInfo{}
-		udn.Mobile = strconv.FormatInt(u.Id, 10)
-		affected, err = db.Where("mobile = ?", mobile).Cols("mobile").Update(&udn)
-		if err != nil {
-			return err
-		}
-
-		// 3修改ModernHouse
-		mh := RetailBrandCustomer{}
-		_, err = db.Where("user_id = ?", user.Id).Delete(&mh)
-		if err != nil {
-			return err
-		}
-
-		mhn := RetailBrandCustomer{}
-		mhn.CustomerId = user.Id
-		_, err = db.Where("user_id = ?", u.Id).Cols("user_id").Update(&mhn)
-		if err != nil {
-			return err
+	if len(newMobileCustomers) > 0 {
+		for _, exist := range newMobileCustomers {
+			db.Id(exist.Id).Update(&CustomerInfo{Mobile: strconv.FormatInt(c.Id, 10)})
 		}
 	}
-
-	// 改User表
-	u.Mobile = mobile
-	_, err = db.Where("mobile = ?", oldMobile).Cols("mobile").Update(&u)
+	oldMobileCustomers, err := CustomerInfo{}.FindByMobile(oldMobile)
 	if err != nil {
 		return err
 	}
-
-	// 改当前品牌
-	udd := CustomerInfo{}
-	has, err = db.Where("mobile = ?", oldMobile).And("brand_code = ?", ud.BrandCode).Get(&udd)
-	if err != nil {
-		return err
-	} else if !has {
-		// Insert
-		affected, err := db.InsertOne(ud)
-		if err == nil && affected == 0 {
-			return errors.New("Affected rows : 0")
+	if len(oldMobileCustomers) > 0 {
+		for _, exist := range oldMobileCustomers {
+			db.Id(exist.Id).Update(&CustomerInfo{CustomerId: c.Id, Mobile: newMobile})
 		}
-		return err
 	}
 
-	_, err = db.Where("mobile = ?", oldMobile).And("brand_code = ?", ud.BrandCode).AllCols().Update(ud)
-	if err != nil {
-		return err
-	}
-
-	// 改所有品牌
-	_, err = db.Where("mobile = ?", oldMobile).Cols("mobile").Update(ud)
-	if err != nil {
-		return err
-	}
-	return err
+	return nil
 }
