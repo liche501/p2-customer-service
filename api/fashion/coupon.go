@@ -44,7 +44,7 @@ type CouponWxcrm struct {
 	Error string `json:"error"`
 }
 
-func ApiGetCouponList(c echo.Context) error {
+func APIGetCouponList(c echo.Context) error {
 	mobile := c.Get("user").(*extends.AuthClaims).Mobile
 	// openId := c.Get("user").(*extends.AuthClaims).OpenId
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode

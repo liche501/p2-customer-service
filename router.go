@@ -57,11 +57,11 @@ func RouterInit() {
 	user.GET("/get_member_info", extends.JWTMiddleware(fashion.APIGetMemberInfo))
 
 	//Coupon
-	co := v1.Group("/coupon")
-	co.GET("/get_coupon_list", demo)
+	co := fa.Group("/coupon")
+	co.GET("/get_coupon_list", extends.JWTMiddleware(fashion.APIGetCouponList))
 
 	//Integral
-	in := v1.Group("/integral")
+	in := fa.Group("/integral")
 	in.GET("/get_current_integral", demo)
 	in.GET("/get_integral_history", demo)
 	in.GET("/get_vip_grade", demo)
