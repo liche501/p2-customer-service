@@ -1,57 +1,11 @@
-// package main
-
-// import (
-// 	"net/http"
-// 	"os"
-
-// 	"github.com/Sirupsen/logrus"
-// 	"github.com/labstack/echo"
-// )
-
-// var (
-// 	log = logrus.New()
-// )
-
-// func init() {
-// 	log.Out = os.Stderr
-// 	log.Level = logrus.DebugLevel
-
-// }
-
-// type User struct {
-// 	Name string `json:"name" xml:"name" form:"name"`
-// 	Age  string `json:"age" xml:"age" form:"age"`
-// }
-
-// func main() {
-// 	e := echo.New()
-// 	e.POST("/user/:id", func(c echo.Context) error {
-// 		// name := c.QueryParam("name")
-// 		// no := c.Param("id")
-// 		// age := c.FormValue("age")
-// 		// log.Debugln(age)
-
-// 		u := new(User)
-// 		if err := c.Bind(u); err != nil {
-// 			return err
-// 		}
-// 		return c.JSON(http.StatusCreated, u)
-// 	})
-// 	e.GET("/ping", func(c echo.Context) error {
-// 		return c.JSON(http.StatusOK, "pong")
-
-// 	})
-// 	e.Logger.Fatal(e.Start(":9000"))
-// }
-
 package main
 
 import (
 	"best/p2-customer-service/config"
-	"best/p2-customer-service/extends"
+	"best/p2-customer-service/model"
+
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -65,17 +19,17 @@ func main() {
 	// Middleware
 	// e.Use(middleware.Logger())
 
-	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte("secret"),
-		Claims:     extends.AuthClaims{},
-		Skipper: func(c echo.Context) bool {
-			switch {
-			case strings.HasPrefix(c.Path(), "/guest"):
-				return true
-			}
-			return false
-		},
-	}))
+	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+	// 	SigningKey: []byte("secret"),
+	// 	Claims:     extends.AuthClaims{},
+	// 	Skipper: func(c echo.Context) bool {
+	// 		switch {
+	// 		case strings.HasPrefix(c.Path(), "/guest"):
+	// 			return true
+	// 		}
+	// 		return false
+	// 	},
+	// }))
 
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, latency=${latency}\n",
@@ -105,6 +59,7 @@ func main() {
 	})
 	RouterInit()
 	config.InitConfig()
+	model.InitDB("mysql", config.Config.DB.Conn)
 
 	// e.Logger.Fatal(e.Start(":9000"))
 	e.Start(":9000")
