@@ -131,8 +131,6 @@ func (CustomerInfo) TableName() string {
 }
 
 func (u *CustomerInfo) Save() error {
-	user := CustomerInfo{}
-
 	var mutex sync.Mutex
 	mutex.Lock()
 	defer mutex.Unlock()
