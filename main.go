@@ -48,8 +48,10 @@ package main
 
 import (
 	"best/p2-customer-service/config"
+	"best/p2-customer-service/extends"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -62,6 +64,19 @@ var (
 func main() {
 	// Middleware
 	// e.Use(middleware.Logger())
+
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte("secret"),
+		Claims:     extends.AuthClaims{},
+		Skipper: func(c echo.Context) bool {
+			switch {
+			case strings.HasPrefix(c.Path(), "/guest"):
+				return true
+			}
+			return false
+		},
+	}))
+
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, latency=${latency}\n",
 	}))

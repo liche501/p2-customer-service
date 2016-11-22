@@ -31,7 +31,7 @@ func RouterInit() {
 	})
 
 	e.GET("/token", func(c echo.Context) error {
-		token, _ := extends.AuthHandler("rc", "openid_111111111", "13691194223", "cust_1000")
+		token, _ := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
 	})
 	t := e.Group("/jwt")
