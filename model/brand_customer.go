@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type CustomerInfo struct {
+type BrandCustomer struct {
 	Id            int64
 	CustomerId    int64 `xorm:"'user_id'"`
 	Name          string
@@ -26,16 +26,16 @@ type CustomerInfo struct {
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
 
-func (CustomerInfo) TableName() string {
+func (BrandCustomer) TableName() string {
 	return "user_detail"
 }
 
-func (u *CustomerInfo) Save() error {
+func (u *BrandCustomer) Save() error {
 	var mutex sync.Mutex
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	exist, err := CustomerInfo{}.Get(u.BrandCode, u.Mobile)
+	exist, err := BrandCustomer{}.Get(u.BrandCode, u.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
@@ -60,8 +60,8 @@ func (u *CustomerInfo) Save() error {
 	return nil
 }
 
-func (CustomerInfo) Get(brandCode, mobile string) (*CustomerInfo, error) {
-	user := CustomerInfo{}
+func (BrandCustomer) Get(brandCode, mobile string) (*BrandCustomer, error) {
+	user := BrandCustomer{}
 	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&user)
 	if err != nil {
 		return nil, err
@@ -71,12 +71,12 @@ func (CustomerInfo) Get(brandCode, mobile string) (*CustomerInfo, error) {
 	return &user, nil
 }
 
-func (CustomerInfo) FindByMobile(mobile string) (customers []CustomerInfo, err error) {
+func (BrandCustomer) FindByMobile(mobile string) (customers []BrandCustomer, err error) {
 	err = db.Where("mobile = ?", mobile).Find(&customers)
 	return
 }
 
-func (u *CustomerInfo) UpdateHasFilled() error {
+func (u *BrandCustomer) UpdateHasFilled() error {
 	affected, err := db.Where("mobile = ?", u.Mobile).And("brand_code = ?", u.BrandCode).Cols("has_filled").Update(u)
 	if err == nil && affected == 0 {
 		return errors.New("Affected rows : 0")
@@ -84,7 +84,7 @@ func (u *CustomerInfo) UpdateHasFilled() error {
 	return err
 }
 
-func (CustomerInfo) ChangeMobileWithOld(oldMobile, newMobile string) error {
+func (BrandCustomer) ChangeMobileWithOld(oldMobile, newMobile string) error {
 	if oldMobile == newMobile {
 		return nil
 	}
@@ -95,22 +95,22 @@ func (CustomerInfo) ChangeMobileWithOld(oldMobile, newMobile string) error {
 
 	// TODO:: This is illogic. Have to remove this logic.
 	c, err := Customer{}.GetByMobile(newMobile)
-	newMobileCustomers, err := CustomerInfo{}.FindByMobile(newMobile)
+	newMobileCustomers, err := BrandCustomer{}.FindByMobile(newMobile)
 	if err != nil {
 		return err
 	}
 	if len(newMobileCustomers) > 0 {
 		for _, exist := range newMobileCustomers {
-			db.Id(exist.Id).Update(&CustomerInfo{Mobile: strconv.FormatInt(c.Id, 10)})
+			db.Id(exist.Id).Update(&BrandCustomer{Mobile: strconv.FormatInt(c.Id, 10)})
 		}
 	}
-	oldMobileCustomers, err := CustomerInfo{}.FindByMobile(oldMobile)
+	oldMobileCustomers, err := BrandCustomer{}.FindByMobile(oldMobile)
 	if err != nil {
 		return err
 	}
 	if len(oldMobileCustomers) > 0 {
 		for _, exist := range oldMobileCustomers {
-			db.Id(exist.Id).Update(&CustomerInfo{CustomerId: c.Id, Mobile: newMobile})
+			db.Id(exist.Id).Update(&BrandCustomer{CustomerId: c.Id, Mobile: newMobile})
 		}
 	}
 

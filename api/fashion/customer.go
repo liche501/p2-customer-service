@@ -160,12 +160,12 @@ func APIGetUserInfo(c echo.Context) error {
 	}
 
 	// If need perfect user info
-	ud, err := model.CustomerInfo{}.Get(ui.FashionBrandCustomer.BrandCode, ui.Customer.Mobile)
+	bc, err := model.BrandCustomer{}.Get(ui.FashionBrandCustomer.BrandCode, ui.Customer.Mobile)
 	if err != nil {
 		logs.Error.Println("GetUserDetail error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	}
-	needPerfect := ud == nil || !ud.HasFilled
+	needPerfect := bc == nil || !bc.HasFilled
 
 	custNo := ui.FashionBrandCustomer.CustNo
 	mobile := ui.Customer.Mobile
@@ -186,29 +186,29 @@ func APIGetMemberInfo(c echo.Context) error {
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 
-	ud, err := model.CustomerInfo{}.Get(brandCode, mobile)
+	bc, err := model.BrandCustomer{}.Get(brandCode, mobile)
 	if err != nil {
 		logs.Error.Println("GetUserDetail error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 	// 完善顾客信息上线前注册的用户
-	if ud == nil {
-		ud = &model.CustomerInfo{}
-		ud.HasFilled = false
+	if bc == nil {
+		bc = &model.BrandCustomer{}
+		bc.HasFilled = false
 	}
-	ud = getUserDetailFromCSL(brandCode, openId, ud, ud.HasFilled)
+	bc = getUserDetailFromCSL(brandCode, openId, bc, bc.HasFilled)
 
 	result := make(map[string]interface{})
-	if ud != nil {
+	if bc != nil {
 		result["mobile"] = mobile
-		result["name"] = ud.Name
-		result["gender"] = ud.Gender
-		result["birthday"] = ud.Birthday
-		result["address"] = ud.Address
-		result["detailAddress"] = ud.DetailAddress
-		result["email"] = ud.Email
-		result["isMarried"] = ud.IsMarried
-		result["hasFilled"] = ud.HasFilled
+		result["name"] = bc.Name
+		result["gender"] = bc.Gender
+		result["birthday"] = bc.Birthday
+		result["address"] = bc.Address
+		result["detailAddress"] = bc.DetailAddress
+		result["email"] = bc.Email
+		result["isMarried"] = bc.IsMarried
+		result["hasFilled"] = bc.HasFilled
 	}
 
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: result})
@@ -216,36 +216,36 @@ func APIGetMemberInfo(c echo.Context) error {
 }
 
 func APIUpdatePerfectInfo(c echo.Context) error {
-	var userDetail model.CustomerInfo
+	var brandCustomer model.BrandCustomer
 	oldMobile := c.Get("user").(*extends.AuthClaims).Mobile
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 
-	userDetail.BrandCode = brandCode
-	userDetail.Name = c.FormValue("name")
-	userDetail.Gender = c.FormValue("gender")
+	brandCustomer.BrandCode = brandCode
+	brandCustomer.Name = c.FormValue("name")
+	brandCustomer.Gender = c.FormValue("gender")
 	phoneNo := c.FormValue("mobile")
 	//logs.Error.Println(userDetail.Name)
 	//logs.Error.Println(phoneNo)
 	if phoneNo != oldMobile {
-		userDetail.Mobile = phoneNo
+		brandCustomer.Mobile = phoneNo
 	} else {
-		userDetail.Mobile = oldMobile
+		brandCustomer.Mobile = oldMobile
 	}
 
 	birthday := c.FormValue("birthday")
 	if birthday != "" {
-		userDetail.Birthday = birthday
+		brandCustomer.Birthday = birthday
 	}
 
-	userDetail.Address = c.FormValue("address")
-	userDetail.DetailAddress = c.FormValue("detailAddress")
-	userDetail.Email = c.FormValue("email")
+	brandCustomer.Address = c.FormValue("address")
+	brandCustomer.DetailAddress = c.FormValue("detailAddress")
+	brandCustomer.Email = c.FormValue("email")
 
 	isMarried := c.FormValue("isMarried")
 	var err error
 	if isMarried != "" {
-		userDetail.IsMarried, err = strconv.ParseBool(isMarried)
+		brandCustomer.IsMarried, err = strconv.ParseBool(isMarried)
 		if err != nil {
 			logs.Error.Println("[UpdatePerfectInfo]isMarried convert bool error", err)
 			return echo.NewHTTPError(http.StatusBadRequest, 10011)
@@ -253,21 +253,21 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 	}
 	logs.Warning.Println(phoneNo, " ", oldMobile)
 	if phoneNo != oldMobile {
-		err = userDetail.ChangeMobileWithOld(oldMobile, phoneNo)
+		err = brandCustomer.ChangeMobileWithOld(oldMobile, phoneNo)
 		if err != nil {
 			logs.Error.Println("[UpdatePerfectInfo]saveUserDetail", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 		}
 	} else {
-		err = userDetail.Save()
+		err = brandCustomer.Save()
 		if err != nil {
 			logs.Error.Println("[UpdatePerfectInfo]saveUserDetail", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 		}
 	}
 
-	userDetail.HasFilled = true
-	err = userDetail.UpdateHasFilled()
+	brandCustomer.HasFilled = true
+	err = brandCustomer.UpdateHasFilled()
 
 	// err = saveUserDetailToCSL(&userDetail, openId)
 	// if err != nil {
@@ -280,7 +280,7 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 }
 
 // 从CSL获取用户信息
-func getUserDetailFromCSL(brandCode, openId string, ud *model.CustomerInfo, splitAddress bool) *model.CustomerInfo {
+func getUserDetailFromCSL(brandCode, openId string, bc *model.BrandCustomer, splitAddress bool) *model.BrandCustomer {
 	url := fmt.Sprintf("%v?BrandCode=%v&OpenId=%v", config.Config.Adapter.CSL.CustomerInterfaceAPI, brandCode, openId)
 	logs.Debug.Println("Start GetUserInfoDetail:", url)
 
@@ -308,23 +308,23 @@ func getUserDetailFromCSL(brandCode, openId string, ud *model.CustomerInfo, spli
 
 	n := strings.Index(data.Address, ",")
 	if splitAddress && n >= 0 {
-		ud.Address = string([]byte(data.Address)[0:n])
-		ud.DetailAddress = string([]byte(data.Address)[n+1:])
+		bc.Address = string([]byte(data.Address)[0:n])
+		bc.DetailAddress = string([]byte(data.Address)[n+1:])
 	} else {
-		ud.DetailAddress = data.Address
+		bc.DetailAddress = data.Address
 	}
-	ud.Name = data.CustName
-	ud.Mobile = data.TelephoneNo
-	ud.Birthday = data.Birthday
-	ud.BrandCode = data.BrandCode
-	ud.Gender = data.SexCode
-	ud.Email = data.EmailAddress
-	ud.IsMarried = data.WeddingChk
-	ud.IsNewCust = data.IsNewCust
-	return ud
+	bc.Name = data.CustName
+	bc.Mobile = data.TelephoneNo
+	bc.Birthday = data.Birthday
+	bc.BrandCode = data.BrandCode
+	bc.Gender = data.SexCode
+	bc.Email = data.EmailAddress
+	bc.IsMarried = data.WeddingChk
+	bc.IsNewCust = data.IsNewCust
+	return bc
 }
 
-func saveUserDetailToCSL(ud *model.CustomerInfo, openId string) error {
+func saveUserDetailToCSL(bc *model.BrandCustomer, openId string) error {
 	type UserDetailCSL struct {
 		Address      string `json:"Address"`
 		Birthday     string `json:"Birthday"`
@@ -341,15 +341,15 @@ func saveUserDetailToCSL(ud *model.CustomerInfo, openId string) error {
 
 	url := config.Config.Adapter.CSL.CustomerInterfaceAPI
 
-	data.Address = ud.Address + "," + ud.DetailAddress
-	data.Birthday = ud.Birthday
-	data.BrandCode = strings.ToUpper(ud.BrandCode)
-	data.CustName = ud.Name
-	data.EmailAddress = ud.Email
-	data.SexCode = ud.Gender
-	data.TelephoneNo = ud.Mobile
+	data.Address = bc.Address + "," + bc.DetailAddress
+	data.Birthday = bc.Birthday
+	data.BrandCode = strings.ToUpper(bc.BrandCode)
+	data.CustName = bc.Name
+	data.EmailAddress = bc.Email
+	data.SexCode = bc.Gender
+	data.TelephoneNo = bc.Mobile
 	data.OpenId = openId
-	if ud.IsMarried {
+	if bc.IsMarried {
 		data.Marry = "1"
 	} else {
 		data.Marry = "0"

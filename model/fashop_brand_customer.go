@@ -97,13 +97,13 @@ func (u *FashionBrandCustomerInfo) Create() error {
 	}
 
 	// create CustomerInfo
-	customerInfo, err := CustomerInfo{}.Get(u.FashionBrandCustomer.BrandCode, u.Mobile)
+	customerInfo, err := BrandCustomer{}.Get(u.FashionBrandCustomer.BrandCode, u.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 
 	if customerInfo == nil {
-		customerInfo = &CustomerInfo{
+		customerInfo = &BrandCustomer{
 			CustomerId: customer.Id,
 			Name:       u.FashionBrandCustomer.ReceiveName,
 			Mobile:     customer.Mobile,

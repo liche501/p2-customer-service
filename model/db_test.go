@@ -36,8 +36,8 @@ func TestUserShopCURD(t *testing.T) {
 				}
 				So(err, ShouldBeNil)
 			})
-			Convey("Check CustomerInfo", func() {
-				c, err := CustomerInfo{}.Get("tt", "13161955000")
+			Convey("Check BrandCustomer", func() {
+				c, err := BrandCustomer{}.Get("tt", "13161955000")
 				if err != nil {
 					fmt.Println("GetByMobile error: ", err)
 				} else {
@@ -244,7 +244,7 @@ func TestUserDetailCUR(t *testing.T) {
 	initDB()
 	Convey("TestUserDetailCUR", t, func() {
 		Convey("SaveUserDetail", func() {
-			u := CustomerInfo{}
+			u := BrandCustomer{}
 			u.Address = "北京 北京 朝阳区"
 			u.Birthday = "19900614"
 			u.BrandCode = "tt"
@@ -263,7 +263,7 @@ func TestUserDetailCUR(t *testing.T) {
 			So(err, ShouldBeNil)
 		})
 		Convey("GetUserDetail", func() {
-			user, err := CustomerInfo{}.Get("tt", "13161955000")
+			user, err := BrandCustomer{}.Get("tt", "13161955000")
 			if err != nil {
 				fmt.Println("GetUserDetail error: ", err)
 			}
@@ -271,7 +271,7 @@ func TestUserDetailCUR(t *testing.T) {
 			So(err, ShouldBeNil)
 		})
 		Convey("UpdateHasFilled", func() {
-			u := CustomerInfo{}
+			u := BrandCustomer{}
 			u.Mobile = "13161955000"
 			u.BrandCode = "tt"
 			u.HasFilled = true
@@ -282,7 +282,7 @@ func TestUserDetailCUR(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			// Delete
-			u = CustomerInfo{}
+			u = BrandCustomer{}
 			_, err = db.Where("mobile = ?", "13161955000").And("brand_code = ?", "tt").Delete(&u)
 			if err != nil {
 				fmt.Println("DeleteUserDetail error: ", err)
