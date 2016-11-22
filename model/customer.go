@@ -9,8 +9,13 @@ type Customer struct {
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
 
+func (Customer) TableName() string {
+	return "user"
+}
+
 type CustomerInfo struct {
-	CustomerID    int64
+	Id            int64
+	CustomerId    int64 `xorm:"'user_id'"`
 	Name          string
 	Mobile        string `xorm:"index"`
 	BrandCode     string
@@ -25,4 +30,8 @@ type CustomerInfo struct {
 
 	CreatedAt time.Time `xorm:"created 'in_date_time'"`
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
+}
+
+func (CustomerInfo) TableName() string {
+	return "user_detail"
 }
