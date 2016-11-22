@@ -2,42 +2,31 @@
 	"DB": {
 		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/wxshop?charset=utf8&parseTime=True&loc=UTC"
 	},
-	"Mongo": {
-		"Conn": "139.196.228.246:27017"
-	},
-	"Contents": {
-		"ServiceHost": "139.196.228.246",
-		"Port": "5001",
-		"CouponApiPrefix": "api/v2/CouponContents"
+	"Coupon": {
+		"Contents": {
+			"ServiceHost": "139.196.228.246",
+			"Port": "5001",
+			"CouponApiPrefix": "api/v2/CouponContents"
+		},
+		"Marketing": {
+			"EventCoupon": "http://10.202.101.17:5700"
+		}
 	},
 	"Adapter": {
-		"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
-		"CustomerInterfaceApi": "http://222.126.166.31:5002/api/v1/Customers"
-	},
-	"UserInfoQueue":{
-		"ServiceHost": "139.224.20.10",
-		"Port": "8004",
-		"ApiPrefix": "api/v1/user/UserSave"
-	},
-	"TaskQueue":{
-		"Broker": "redis://10.202.101.52:6379"
+		"CSL":{
+			"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
+			"CustomerInterfaceApi": "http://222.126.166.31:5002/api/v1/Customers"
+		},
+		"MH": {
+			"ServiceHost": "222.126.161.59",
+			"Port": "8093",
+			"MemberApiPrefix": "ws_member.asmx"
+		}
 	},
 	"CaptchaService":{
 		"ServiceHost": "139.196.228.246",
 		"Port": "9094",
 		"ApiPrefix": "captcha"
-	},
-	"MhService": {
-		"ServiceHost": "222.126.161.59",
-		"Port": "8093",
-		"MemberApiPrefix": "ws_member.asmx"
-	},
-	"FrontDomain": {
-		"Fashion": "http://fashion-wxshop.accurate9.com:3000",
-		"RC":"http://fashion-wxshop-rc.accurate9.com:3000"
-	},
-	"Marketing": {
-		"EventCoupon": "http://10.202.101.17:5700"
 	}
 }
   

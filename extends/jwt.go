@@ -82,6 +82,9 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Set("mobileWithToken", mobile)
 		c.Set("custNoWithToken", custNo)
 
+		c.Set("user", ac)
+		// c.Get("user").(*AuthClaims).OpenId
+
 		return next(c)
 	}
 }
