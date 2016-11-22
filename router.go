@@ -70,9 +70,9 @@ func RouterInit() {
 	// Common
 	c := v1.Group("/common")
 	s := c.Group("/sms")
-	s.GET("/get_code", demo)
-	s.GET("/check_sms", demo)
-	s.GET("/ative", demo)
+	s.GET("/code", common.ApiSendSms)
+	s.GET("/success", common.ApiCheckSms)
+	s.GET("/ative", common.Active)
 
 	p := c.Group("/captcha")
 	p.GET("/key", common.APIGetCaptchaKey)
