@@ -3,6 +3,7 @@ package main
 import (
 	"best/p2-customer-service/api/common"
 	"best/p2-customer-service/api/fashion"
+	"best/p2-customer-service/event"
 
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/extends"
@@ -81,4 +82,6 @@ func RouterInit() {
 
 	a := c.Group("/auth")
 	a.GET("/set_auth", demo)
+
+	v1.POST("/events", event.ApiHandleEvent)
 }
