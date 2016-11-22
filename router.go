@@ -74,8 +74,8 @@ func RouterInit() {
 
 	p := c.Group("/captcha")
 	p.GET("/key", common.APIGetCaptchaKey)
-	p.GET("/image/:key", demo)
-	p.GET("/success/:key/:code", demo)
+	p.GET("/image", demo)
+	p.GET("/success", common.ApiCheckCaptcha)
 
 	a := c.Group("/auth")
 	a.GET("/set_auth", demo)
