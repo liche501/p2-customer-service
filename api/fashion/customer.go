@@ -64,10 +64,12 @@ func APIRegister(c echo.Context) error {
 	fashionBrandCustomerInfo.FashionBrandCustomer.WxOpenID = openId
 	logs.Debug.Println(fashionBrandCustomerInfo)
 
+    //customer regist 
 	if err := fashionBrandCustomerInfo.Create(); err != nil {
 		logs.Error.Println(err)
 
 	}
+    
 
 	return echo.NewHTTPError(http.StatusBadRequest, 10012)
 
