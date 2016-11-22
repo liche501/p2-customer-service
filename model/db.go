@@ -1,10 +1,16 @@
 package model
 
 import (
+	"errors"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+)
+
+var (
+	CustomerNotExistError          = errors.New("User not exists")
+	BrandCustomerAlreadyExistError = errors.New("BrandCustomer already exists")
 )
 
 var db *xorm.Engine
@@ -18,10 +24,9 @@ func InitDB(dialect, conn string) error {
 
 	isDebug := os.Getenv("WXSHOPDEBUG")
 	if len(isDebug) > 0 {
-		db.ShowSQL(true)
+		// db.ShowSQL(true)
 	}
 
-	// return db.Sync2(new(User), new(UserShop), new(Sms), new(UserDetail), new(ErrorUser), new(UserMh))
 	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(CustomerInfo), new(RetailBrandCustomer), new(Sms))
 
 }
