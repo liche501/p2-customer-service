@@ -217,8 +217,7 @@ func APIGetMemberInfo(c echo.Context) error {
 
 func APIUpdatePerfectInfo(c echo.Context) error {
 	var userDetail model.CustomerInfo
-	var oldmobile string
-	mobile := c.Get("user").(*extends.AuthClaims).Mobile
+	oldMobile := c.Get("user").(*extends.AuthClaims).Mobile
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 
@@ -228,12 +227,10 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 	phoneNo := c.FormValue("mobile")
 	//logs.Error.Println(userDetail.Name)
 	//logs.Error.Println(phoneNo)
-	if phoneNo != mobile {
+	if phoneNo != oldMobile {
 		userDetail.Mobile = phoneNo
-		mobile = phoneNo
-		oldmobile = mobile
 	} else {
-		userDetail.Mobile = mobile
+		userDetail.Mobile = oldMobile
 	}
 
 	birthday := c.FormValue("birthday")
@@ -254,8 +251,9 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusBadRequest, 10011)
 		}
 	}
-	if phoneNo != mobile {
-		err = userDetail.ChangeMobileWithOld(oldmobile, mobile)
+	logs.Warning.Println(phoneNo, " ", oldMobile)
+	if phoneNo != oldMobile {
+		err = userDetail.ChangeMobileWithOld(oldMobile, phoneNo)
 		if err != nil {
 			logs.Error.Println("[UpdatePerfectInfo]saveUserDetail", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, 10013)
