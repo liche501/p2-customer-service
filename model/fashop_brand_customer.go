@@ -18,7 +18,6 @@ type FashionBrandCustomer struct {
 	ReceiveName      string `xorm:"'receiv_name'"`
 	ReceiveSize      string `xorm:"'receiv_size'"`
 
-	Status    string    `xorm:"varchar(40) 'regist_status'"`
 	CreatedAt time.Time `xorm:"created 'in_date_time'"`
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
@@ -68,7 +67,7 @@ func (FashionBrandCustomer) GetByCustomerID(brandCode string, customerID int64) 
 type FashionBrandCustomerInfo struct {
 	Customer             `xorm:"extends"`
 	FashionBrandCustomer `xorm:"extends"`
-	BC                   BrandCustomer `xorm:"extends"`
+	BrandCustomer        BrandCustomer `xorm:"extends"`
 }
 
 func (u *FashionBrandCustomerInfo) Create() error {
@@ -171,11 +170,12 @@ func (FashionBrandCustomerInfo) GetByWxOpenID(brandCode, wxOpenId string) (*Fash
 	return &c, nil
 }
 
-func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
+func (FashionBrandCustomerInfo) GetSuccessUserByWxOpenID(brandCode, wxOpenId string) (*FashionBrandCustomerInfo, error) {
+	const successState = "BrandCustomerCreated"
 	var c FashionBrandCustomerInfo
 	has, err := db.Table("user").Join("INNER", "user_detail", "user_detail.user_id = user.id").
 		Join("INNER", "user_shop", "user_shop.user_id = user.id").
-		Where("user_shop.open_id = ?", wxOpenId).And("user_shop.brand_code = ?", brandCode).And("user_detail.status = ?", status).
+		Where("user_shop.open_id = ?", wxOpenId).And("user_shop.brand_code = ?", brandCode).And("user_detail.status = ?", successState).
 		Get(&c)
 	if err != nil {
 		return nil, err
@@ -184,4 +184,8 @@ func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, stat
 		return nil, CustomerNotExistError
 	}
 	return &c, nil
+}
+
+func (c *FashionBrandCustomerInfo) Status() string {
+	return c.BrandCustomer.Status
 }

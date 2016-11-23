@@ -92,15 +92,12 @@ func APILogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
 
-	us, err := model.FashionBrandCustomerInfo{}.GetByWxOpenIDAndStatus(brandCode, openId, "BrandCustomerCreated")
+	us, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
 	if err == model.CustomerNotExistError {
 		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20003, Message: ""}})
 	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
-	}
-	if us == nil {
-		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20003, Message: ""}})
 	}
 
 	jsonWebToken, err := extends.AuthHandler(brandCode, openId, us.Customer.Mobile, us.FashionBrandCustomer.CustNo)
@@ -108,7 +105,7 @@ func APILogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, 20002)
 	}
 	logs.Warning.Println("Create JsonWebToken: ", jsonWebToken)
-	rs := APIResult{Success: true, Result: map[string]string{"token": jsonWebToken, "status": us.FashionBrandCustomer.Status}}
+	rs := APIResult{Success: true, Result: map[string]string{"token": jsonWebToken, "status": us.Status()}}
 	return c.JSON(http.StatusOK, rs)
 
 }
@@ -126,7 +123,7 @@ func APIGetCustomerInfo(c echo.Context) error {
 	c.Response().Header().Set("Content-Type", "text/event-stream")
 	c.Response().Header().Set("Cache-Control", "no-cache")
 
-	ui, err := model.FashionBrandCustomer{}.GetByWxOpenID(brandCode, openId)
+	ui, err := model.FashionBrandCustomerInfo{}.GetByWxOpenID(brandCode, openId)
 	if err != nil {
 		logs.Error.Println("GetByOpenidWithoutResgitStatus error: ", err)
 		return c.String(http.StatusOK, "data:nouser\n\nexist")
@@ -138,13 +135,14 @@ func APIGetCustomerInfo(c echo.Context) error {
 
 	logs.Debug.Printf("RegistStatus for openId %v: %v", openId, ui.Status)
 
-	if ui.Status == "Error01" {
+	if ui.Status() == "BrandCustomerDuplicated" {
 		return c.String(http.StatusOK, "data:nouser\n\nError01")
-
-	} else if ui.Status == "OtherError" {
+	}
+	if ui.Status() == "BrandCustomerFailed" {
 		return c.String(http.StatusOK, "data:nouser\n\nOtherError")
 
-	} else if len(ui.CustNo) > 0 && ui.Status == "Success" {
+	}
+	if len(ui.CustNo) > 0 && ui.Status() == "BrandCustomerCreated" {
 		return c.String(http.StatusOK, "data:nouser\n\nexist")
 	}
 	return c.String(http.StatusOK, "data:nouser\n\n")
@@ -157,7 +155,7 @@ func APIGetUserInfo(c echo.Context) error {
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 
-	ui, err := model.FashionBrandCustomerInfo{}.GetByWxOpenIDAndStatus(brandCode, openId, "Success")
+	ui, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
 	if err != nil {
 		logs.Error.Println("GetByOpenid error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
