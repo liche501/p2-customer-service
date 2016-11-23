@@ -93,11 +93,13 @@ func APILogin(c echo.Context) error {
 	}
 
 	us, err := model.FashionBrandCustomerInfo{}.GetByWxOpenIDAndStatus(brandCode, openId, "BrandCustomerCreated")
+	if err == model.CustomerNotExistError {
+		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20003, Message: ""}})
+	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 	if us == nil {
-
 		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20003, Message: ""}})
 	}
 

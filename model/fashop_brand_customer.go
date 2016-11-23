@@ -68,6 +68,7 @@ func (FashionBrandCustomer) GetByCustomerID(brandCode string, customerID int64) 
 type FashionBrandCustomerInfo struct {
 	Customer             `xorm:"extends"`
 	FashionBrandCustomer `xorm:"extends"`
+	BC                   BrandCustomer `xorm:"extends"`
 }
 
 func (u *FashionBrandCustomerInfo) Create() error {
@@ -107,6 +108,7 @@ func (u *FashionBrandCustomerInfo) Create() error {
 			CustomerId: customer.Id,
 			Name:       u.FashionBrandCustomer.ReceiveName,
 			Mobile:     customer.Mobile,
+			WxOpenID:   u.FashionBrandCustomer.WxOpenID,
 			BrandCode:  u.FashionBrandCustomer.BrandCode,
 		}
 		if err := customerInfo.Save(); err != nil {
@@ -154,20 +156,32 @@ func (u *FashionBrandCustomerInfo) UpdateForGame() error {
 	return nil
 }
 
-func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
+func (FashionBrandCustomerInfo) GetByWxOpenID(brandCode, wxOpenId string) (*FashionBrandCustomerInfo, error) {
+	var c FashionBrandCustomerInfo
+	has, err := db.Table("user").Join("INNER", "user_detail", "user_detail.user_id = user.id").
+		Join("INNER", "user_shop", "user_shop.user_id = user.id").
+		Where("user_shop.open_id = ?", wxOpenId).And("user_shop.brand_code = ?", brandCode).
+		Get(&c)
+	if err != nil {
+		return nil, err
+	}
+	if !has {
+		return nil, CustomerNotExistError
+	}
+	return &c, nil
+}
 
-	u := FashionBrandCustomerInfo{}
-	has, err := db.Where("open_id = ?", wxOpenId).And("brand_code = ?", brandCode).And("regist_status = ?", status).Get(&u.FashionBrandCustomer)
+func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
+	var c FashionBrandCustomerInfo
+	has, err := db.Table("user").Join("INNER", "user_detail", "user_detail.user_id = user.id").
+		Join("INNER", "user_shop", "user_shop.user_id = user.id").
+		Where("user_shop.open_id = ?", wxOpenId).And("user_shop.brand_code = ?", brandCode).And("user_detail.status = ?", status).
+		Get(&c)
 	if err != nil {
 		return nil, err
-	} else if !has {
-		return nil, nil
 	}
-	has, err = db.Where("id = ?", u.FashionBrandCustomer.CustomerId).Get(&u.Customer)
-	if err != nil {
-		return nil, err
-	} else if !has {
-		return nil, nil
+	if !has {
+		return nil, CustomerNotExistError
 	}
-	return &u, nil
+	return &c, nil
 }
