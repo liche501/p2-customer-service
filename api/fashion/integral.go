@@ -42,8 +42,6 @@ func ApiGetCurrentIntegral(c echo.Context) error {
 	_, body, reqErr := goreq.New().Get(url).Query(q).ContentType("xml").SetCurlCommand(true).EndBytes()
 	if reqErr != nil {
 		logs.Error.Println("GetCurrentIntegral error: ", reqErr)
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003, reqErr[0].Error())
-		// return
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	}
 
@@ -56,7 +54,6 @@ func ApiGetCurrentIntegral(c echo.Context) error {
 
 	result := make(map[string]string)
 	result["RetainMileage"] = structData.RetainMileage
-	//extends.ReturnJsonSuccess(w, http.StatusOK, result)
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: result})
 }
 
@@ -70,10 +67,6 @@ func ApiGetIntegralHistory(c echo.Context) error {
 	if mobile == "" || openId == "" || brandCode == "" {
 		return echo.NewHTTPError(http.StatusForbidden, 20001)
 	}
-
-	// openId = "oS1CewapWOtyanVNPJsd4DesSwys"
-	// brandCode = "BC"
-
 	// A:获取积分记录 B:使用积分记录
 	integralType := c.FormValue("integralType")
 	if integralType == "" {
@@ -121,7 +114,6 @@ func ApiGetIntegralHistory(c echo.Context) error {
 		m["Date"] = structData.Date[i]
 		listData = append(listData, m)
 	}
-	//extends.ReturnJsonSuccess(w, http.StatusOK, listData)
 
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: listData})
 }
@@ -159,15 +151,13 @@ func ApiGetVipGrade(c echo.Context) error {
 	if err != nil {
 		logs.Error.Println("Unmarshal xml error: ", err)
 	}
-	// logs.Warning.Println(DataFromXML.Text)
 
 	vipGradeDto := new(VipGradeDto)
 	err = json.Unmarshal([]byte(DataFromXML.Text), vipGradeDto)
 	if err != nil {
 		logs.Error.Println("Unmarshal xml error: ", err)
 	}
-	// logs.Succ.Println(vipGradeDto)
-	//extends.ReturnJsonSuccess(w, http.StatusOK, vipGradeDto)
+
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: vipGradeDto})
 }
 
@@ -200,10 +190,7 @@ func ApiUpdateIntegralExchange(c echo.Context) error {
 	err = json.Unmarshal([]byte(DataFromXML.Text), vipGradeDto)
 	if err != nil {
 		logs.Error.Println("Unmarshal xml error: ", err)
-		// return nil, nil
 	}
-	// logs.Succ.Println(vipGradeDto)
-	//extends.ReturnJsonSuccess(w, http.StatusOK, vipGradeDto)
 
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: vipGradeDto})
 
