@@ -35,8 +35,8 @@ func APIGetCaptchaKey(c echo.Context) error {
 }
 
 func ApiCheckCaptcha(c echo.Context) error {
-	key := c.FormValue("key")
-	code := c.FormValue("code")
+	key := c.QueryParam("key")
+	code := c.QueryParam("code")
 	logs.Debug.Println(code)
 	if key == "" || code == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)

@@ -24,7 +24,7 @@ func InitDB(dialect, conn string) error {
 
 	isDebug := os.Getenv("WXSHOPDEBUG")
 	if len(isDebug) > 0 {
-		// db.ShowSQL(true)
+		db.ShowSQL(true)
 	}
 
 	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(BrandCustomer), new(RetailBrandCustomer), new(Sms))

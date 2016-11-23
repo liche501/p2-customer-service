@@ -131,3 +131,18 @@ func (BrandCustomer) ChangeMobileWithOld(oldMobile, newMobile string) error {
 
 	return nil
 }
+
+func (u *BrandCustomer) UpdateStatusAndCustNo() error {
+	affected, err := db.Where("user_id = ?", u.CustomerId).And("brand_code = ?", u.BrandCode).Cols("status", "cust_no").Update(u)
+	if err == nil && affected == 0 {
+		return errors.New("Affected rows : 0")
+	}
+	return err
+}
+func (u *BrandCustomer) UpdateStatus() error {
+	affected, err := db.Where("user_id = ?", u.CustomerId).And("brand_code = ?", u.BrandCode).Cols("status").Update(u)
+	if err == nil && affected == 0 {
+		return errors.New("Affected rows : 0")
+	}
+	return err
+}

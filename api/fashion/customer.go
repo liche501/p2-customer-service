@@ -20,13 +20,11 @@ import (
 // APICheckMobile: 注册/修改手机号时检查注册状态
 func APICheckMobileAvailableForRegister(c echo.Context) error {
 	mobile := c.QueryParam("mobile")
-	openId := c.QueryParam("openId")
 	brandCode := c.QueryParam("brandCode")
 
-	logs.Debug.Println(mobile, openId, brandCode)
-	if mobile == "" || openId == "" || brandCode == "" {
+	logs.Debug.Println(mobile, brandCode)
+	if mobile == "" || brandCode == "" {
 		return c.JSON(http.StatusBadRequest, APIResult{
-			Success: false,
 			Error: APIError{
 				Code:    10012,
 				Message: "Mobile, WxOpenID and BrandCode are required parameter.",
@@ -38,11 +36,10 @@ func APICheckMobileAvailableForRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10012)
 	}
 	if err == model.CustomerNotExistError {
-		logs.Warning.Println(1111)
-		return c.JSON(http.StatusOK, APIResult{Success: true, Result: true})
+		return c.JSON(http.StatusOK, APIResult{Success: true})
 	}
 
-	return c.JSON(http.StatusOK, APIResult{Success: true, Result: false})
+	return c.JSON(http.StatusOK, APIResult{Success: false})
 }
 
 // curl -X POST -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJicmFuZENvZGUiOiJyYyIsIm9wZW5JZCI6Im9ZaVI2d1R6NmFucjVLcGlSSC1tUmNwdnZMUGMiLCJtb2JpbGUiOiIxMzY5MTE5NDIyMyIsImN1c3RObyI6IjAwMDE4NTIzNTkiLCJleHAiOjE0ODAwNjQ2NDIsImlzcyI6ImxpY2hlIn0.huxuvLITetwHzdpZHX-T_sfZe0rEeMM_2DOnugdUjRo" -H "Cache-Control: no-cache" -H "Postman-Token: 28bf6f4d-9809-26a2-3229-4a177c8d29cf" "http://localhost:9000/api/v1/fashion/user/register?mobile=13691194223&verCode=1234"
@@ -79,7 +76,21 @@ func APIRegister(c echo.Context) error {
 	//customer regist
 	if err := fashionBrandCustomerInfo.Create(); err != nil {
 		logs.Error.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
+
+	//UpdateStatus BrandCustomerInitiated
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = brandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerInitiated"
+	// err := bc.UpdateStatus()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return echo.NewHTTPError(http.StatusInternalServerError, err)
+	// }
+
+	// WillDo:: sendEvent => BrandCustomerConfirmed
 
 	return c.JSON(http.StatusOK, APIResult{Success: true})
 
@@ -89,7 +100,7 @@ func APILogin(c echo.Context) error {
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 	if openId == "" || brandCode == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, 10012)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10012)
 	}
 
 	us, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
@@ -223,11 +234,19 @@ func APIGetMemberInfo(c echo.Context) error {
 }
 
 func APIUpdatePerfectInfo(c echo.Context) error {
-	var brandCustomer model.BrandCustomer
+	// var brandCustomer model.BrandCustomer
 	oldMobile := c.Get("user").(*extends.AuthClaims).Mobile
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
+	custNo := c.Get("user").(*extends.AuthClaims).CustNo
 
+	brandCustomer, err := model.BrandCustomer{}.Get(brandCode, oldMobile)
+	if err != nil {
+		logs.Error.Println(err)
+	}
+
+	brandCustomer.WxOpenID = openId
+	brandCustomer.CustNo = custNo
 	brandCustomer.BrandCode = brandCode
 	brandCustomer.Name = c.FormValue("name")
 	brandCustomer.Gender = c.FormValue("gender")
@@ -250,7 +269,7 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 	brandCustomer.Email = c.FormValue("email")
 
 	isMarried := c.FormValue("isMarried")
-	var err error
+	// var err error
 	if isMarried != "" {
 		brandCustomer.IsMarried, err = strconv.ParseBool(isMarried)
 		if err != nil {
@@ -276,11 +295,11 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 	brandCustomer.HasFilled = true
 	err = brandCustomer.UpdateHasFilled()
 
-	// err = saveUserDetailToCSL(&userDetail, openId)
-	// if err != nil {
-	// 	logs.Error.Println("[SaveUserDetailToCSL]saveUserDetail", err)
-	// 	return echo.NewHTTPError(http.StatusInternalServerError, 10013)
-	// }
+	err = saveUserDetailToCSL(brandCustomer, openId)
+	if err != nil {
+		logs.Error.Println("[SaveUserDetailToCSL]saveUserDetail", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	}
 
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: map[string]string{"openId": openId}})
 

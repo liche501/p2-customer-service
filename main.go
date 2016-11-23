@@ -18,13 +18,14 @@ var (
 func main() {
 	// Middleware
 	// e.Use(middleware.Logger())
-
 	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-	// 	SigningKey: []byte("secret"),
+	// 	SigningKey: privKey,
 	// 	Claims:     extends.AuthClaims{},
 	// 	Skipper: func(c echo.Context) bool {
 	// 		switch {
-	// 		case strings.HasPrefix(c.Path(), "/guest"):
+	// 		case strings.HasPrefix(c.Path(), "/createtoken"):
+	// 			return true
+	// 		case strings.HasPrefix(c.Path(), "/api/v1/common"):
 	// 			return true
 	// 		}
 	// 		return false

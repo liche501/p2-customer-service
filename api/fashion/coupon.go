@@ -5,7 +5,6 @@ import (
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/extends"
 	"best/p2-customer-service/logs"
-	"best/p2-customer-service/model"
 
 	"fmt"
 	"net/http"
@@ -45,15 +44,8 @@ type CouponWxcrm struct {
 }
 
 func APIGetCouponList(c echo.Context) error {
-	mobile := c.Get("user").(*extends.AuthClaims).Mobile
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	custNo := c.Get("user").(*extends.AuthClaims).CustNo
-
-	ui, err := model.FashionBrandCustomer{}.GetByMobile(brandCode, mobile)
-	if err != nil {
-		logs.Error.Println("call GetCurrentUser err:", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
-	}
 
 	// TODO:: getCouponIfNeed(ui.CustNo, mobile, ui.BrandCode)
 
@@ -61,7 +53,7 @@ func APIGetCouponList(c echo.Context) error {
 	serviceURL := fmt.Sprintf("http://%s:%s/%s", config.Config.Coupon.Contents.ServiceHost, config.Config.Coupon.Contents.Port, config.Config.Coupon.Contents.CouponAPIPrefix)
 	logs.Debug.Println("serviceUrl:", serviceURL)
 
-	q := fmt.Sprintf("CustomerNo=%v&BrandCode=%v", ui.CustNo, strings.ToUpper(brandCode))
+	q := fmt.Sprintf("CustomerNo=%v&BrandCode=%v", custNo, strings.ToUpper(brandCode))
 	_, _, reqErr := goreq.New().Get(serviceURL).Query(q).BindBody(&map_data).SetCurlCommand(true).End()
 	if reqErr != nil {
 		logs.Error.Println("reqErr:", reqErr)
@@ -152,4 +144,18 @@ func (Coupon) Decompose(map_data []Coupon) map[string][]Coupon {
 	logs.Debug.Println("noUseList_cout:", len(container["noUseList"]))
 	logs.Debug.Println("useList_cout:", len(container["useList"]))
 	return container
+}
+
+func SendCoupon(brandCode, custNo string) error {
+
+	url := config.Config.Adapter.CSL.CustomerInterfaceAPI + "/" + strings.ToUpper(brandCode) + custNo + "/Coupons"
+	logs.Debug.Println("[SendCoupon]url", url)
+	_, textData, reqErr := goreq.New().Post(url).SetCurlCommand(true).End()
+	if reqErr != nil || textData == "" {
+		logs.Error.Println("reqErr", len(reqErr), " textData:", textData)
+		return reqErr[0]
+	}
+	logs.Succ.Println("[SendCoupon] success", textData)
+
+	return nil
 }
