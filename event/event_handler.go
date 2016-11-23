@@ -66,6 +66,7 @@ func (e *BrandCustomerConfirmed) Handle() error {
 		logs.Error.Println(err)
 		return err
 	}
+	// WillDo:: SendCoupon
 	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
 	// if err != nil {
 	// 	logs.Error.Println(err)

@@ -45,7 +45,7 @@ func RouterInit() {
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
 	})
 	t := e.Group("/jwt")
-	// t.Use(extends.JWTMiddleware)
+	t.Use(extends.JWTMiddleware)
 	t.GET("", func(c echo.Context) error {
 
 		return c.String(http.StatusOK, "Welcome")

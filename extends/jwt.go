@@ -39,7 +39,7 @@ func AuthHandler(brandCode, openId, mobile, custNo string) (string, error) {
 		mobile,
 		custNo,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 1172).Unix(),
 			Issuer:    "liche",
 		},
 	}
