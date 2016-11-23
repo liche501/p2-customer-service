@@ -46,7 +46,6 @@ type CouponWxcrm struct {
 
 func APIGetCouponList(c echo.Context) error {
 	mobile := c.Get("user").(*extends.AuthClaims).Mobile
-	// openId := c.Get("user").(*extends.AuthClaims).OpenId
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	custNo := c.Get("user").(*extends.AuthClaims).CustNo
 
@@ -55,7 +54,8 @@ func APIGetCouponList(c echo.Context) error {
 		logs.Error.Println("call GetCurrentUser err:", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
-	getCouponIfNeed(ui.CustNo, mobile, ui.BrandCode)
+
+	// TODO:: getCouponIfNeed(ui.CustNo, mobile, ui.BrandCode)
 
 	var map_data []Coupon
 	serviceURL := fmt.Sprintf("http://%s:%s/%s", config.Config.Coupon.Contents.ServiceHost, config.Config.Coupon.Contents.Port, config.Config.Coupon.Contents.CouponAPIPrefix)
@@ -65,24 +65,21 @@ func APIGetCouponList(c echo.Context) error {
 	_, _, reqErr := goreq.New().Get(serviceURL).Query(q).BindBody(&map_data).SetCurlCommand(true).End()
 	if reqErr != nil {
 		logs.Error.Println("reqErr:", reqErr)
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003)
-		// return
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	}
-	// logs.Debug.Println("custNo==", custNo)
 
-	map_data, errWxcrm := Coupon{}.AddCouponFromWxcrm(c, map_data, strings.ToUpper(brandCode), custNo)
-	if errWxcrm != nil {
-		logs.Error.Println("errWxcrm:", errWxcrm)
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003)
-		// return
+	wxcrmCoupons, err := Coupon{}.GetFromWxcrm(strings.ToUpper(brandCode), custNo)
+	if err != nil {
+		logs.Error.Println("reqErr:", reqErr)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	}
-	container := Coupon{}.DecomposeCoupon(map_data)
-	//extends.ReturnJsonSuccess(w, http.StatusOK, container)
+	map_data = append(map_data, wxcrmCoupons...)
+
+	container := Coupon{}.Decompose(map_data)
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: container})
 }
-func (Coupon) AddCouponFromWxcrm(c echo.Context, map_data []Coupon, brandCode, custNo string) ([]Coupon, error) {
+
+func (Coupon) GetFromWxcrm(brandCode, custNo string) ([]Coupon, error) {
 	var wx_data CouponWxcrm
 	//"http://10.202.101.17:5700/api/v1/Coupon/EE/GetCouponList/0000114179"
 	serviceUrl := fmt.Sprintf("%s/api/v1/Coupon/%s/GetCouponList/%s", config.Config.Coupon.Marketing.EventCoupon, brandCode, custNo)
@@ -93,19 +90,15 @@ func (Coupon) AddCouponFromWxcrm(c echo.Context, map_data []Coupon, brandCode, c
 		End()
 	if reqErr != nil {
 		logs.Error.Println("reqErr:", reqErr)
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003)
-		// return nil, reqErr[0]
-		//   return c.JSON(http.StatusOK, APIResult{Success: true, Result: container})
 		return nil, reqErr[0]
 	}
-	// logs.Warning.Println("body==", body)
-	// logs.Succ.Println("wx_data==", wx_data)
 
+	coupons := []Coupon{}
 	for _, value := range wx_data.Result {
-		temp_data := Coupon{}
-		temp_data.CouponName = value.Title
-		temp_data.CouponNo = value.CouponNo
-		temp_data.CouponType.CouponTypeCode = value.Type
+		tempData := Coupon{}
+		tempData.CouponName = value.Title
+		tempData.CouponNo = value.CouponNo
+		tempData.CouponType.CouponTypeCode = value.Type
 		CouponTypeName := ""
 		switch value.Type {
 		case "CostMinus":
@@ -115,19 +108,18 @@ func (Coupon) AddCouponFromWxcrm(c echo.Context, map_data []Coupon, brandCode, c
 		case "Exchange":
 			CouponTypeName = "兑换券"
 		}
-		temp_data.CouponType.CouponTypeName = CouponTypeName
-		temp_data.DiscountDescription = value.Description
-		temp_data.RuleDescription = value.Notice
-		temp_data.StartDate = value.StartDate
-		temp_data.EndDate = value.EndDate
-		temp_data.Used = value.UseChk
-		map_data = append(map_data, temp_data)
+		tempData.CouponType.CouponTypeName = CouponTypeName
+		tempData.DiscountDescription = value.Description
+		tempData.RuleDescription = value.Notice
+		tempData.StartDate = value.StartDate
+		tempData.EndDate = value.EndDate
+		tempData.Used = value.UseChk
+		coupons = append(coupons, tempData)
 	}
-	// logs.Succ.Println("map_data==", map_data)
-	return map_data, nil
+	return coupons, nil
 }
 
-func (Coupon) DecomposeCoupon(map_data []Coupon) map[string][]Coupon {
+func (Coupon) Decompose(map_data []Coupon) map[string][]Coupon {
 	container := make(map[string][]Coupon)
 	container["dueList"] = []Coupon{}
 	container["noUseList"] = []Coupon{}
@@ -160,17 +152,4 @@ func (Coupon) DecomposeCoupon(map_data []Coupon) map[string][]Coupon {
 	logs.Debug.Println("noUseList_cout:", len(container["noUseList"]))
 	logs.Debug.Println("useList_cout:", len(container["useList"]))
 	return container
-}
-
-func getCouponIfNeed(custNo, mobile, brandCode string) {
-	// 判断是否需要发券
-	// us := model.FashionBrandCustomer{}
-	// times, err := us.GetCouponErrorTimes(mobile, brandCode)
-	// if err != nil {
-	// 	logs.Error.Println("Call GetCouponErrorTimes err:", err)
-	// 	return
-	// }
-	// if times > 0 && times < 4 {
-	// 	//task.SendCoupon(mobile, custNo, brandCode, config.Config.Adapter.CustomerInterfaceApi)
-	// }
 }
