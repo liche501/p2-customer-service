@@ -1,7 +1,7 @@
 package event
 
 import (
-	"best/wxshop/logs"
+	"best/p2-customer-service/logs"
 	"bytes"
 	"encoding/json"
 	"fmt"

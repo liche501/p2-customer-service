@@ -63,10 +63,10 @@ func RouterInit() {
 
 	//Integral
 	in := fa.Group("/integral")
-	in.GET("/get_current_integral", demo)
-	in.GET("/get_integral_history", demo)
-	in.GET("/get_vip_grade", demo)
-	in.GET("/update_integral_exchange", demo)
+	in.GET("/current", fashion.ApiGetCurrentIntegral)
+	in.GET("/history", fashion.ApiGetIntegralHistory)
+	in.GET("/grade", fashion.ApiGetVipGrade)
+	in.GET("/update_integral_exchange", fashion.ApiUpdateIntegralExchange)
 
 	// Common
 	c := v1.Group("/common")
