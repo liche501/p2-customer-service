@@ -19,9 +19,9 @@ import (
 
 // APICheckMobile: 注册/修改手机号时检查注册状态
 func APICheckMobileAvailableForRegister(c echo.Context) error {
-	mobile := c.Get("user").(*extends.AuthClaims).Mobile
-	openId := c.Get("user").(*extends.AuthClaims).OpenId
-	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
+	mobile := c.QueryParam("mobile")
+	openId := c.QueryParam("openId")
+	brandCode := c.QueryParam("brandCode")
 
 	logs.Debug.Println(mobile, openId, brandCode)
 	if mobile == "" || openId == "" || brandCode == "" {
@@ -38,7 +38,8 @@ func APICheckMobileAvailableForRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10012)
 	}
 	if err == model.CustomerNotExistError {
-		c.JSON(http.StatusOK, APIResult{Success: true, Result: true})
+		logs.Warning.Println(1111)
+		return c.JSON(http.StatusOK, APIResult{Success: true, Result: true})
 	}
 
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: false})

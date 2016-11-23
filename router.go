@@ -61,7 +61,7 @@ func RouterInit() {
 	user.GET("/get_customer_info", extends.JWTMiddleware(fashion.APIGetCustomerInfo))
 	user.GET("/get_user_info", extends.JWTMiddleware(fashion.APIGetUserInfo))
 	user.POST("/update_perfect_info", extends.JWTMiddleware(fashion.APIUpdatePerfectInfo))
-	user.GET("/check_mobile", extends.JWTMiddleware(fashion.APICheckMobileAvailableForRegister))
+	user.GET("/check_mobile", fashion.APICheckMobileAvailableForRegister)
 	user.GET("/get_member_info", extends.JWTMiddleware(fashion.APIGetMemberInfo))
 
 	//Coupon
