@@ -7,11 +7,14 @@ import (
 	"time"
 )
 
+// TODO:: WxOpenID, CustNo 로직 검증(jang.jaehue)
 type BrandCustomer struct {
 	Id            int64
 	CustomerId    int64 `xorm:"'user_id'"`
 	Name          string
 	Mobile        string `xorm:"index"`
+	WxOpenID      string `xorm:"'wx_open_id'"`
+	CustNo        string
 	BrandCode     string
 	Gender        string
 	Birthday      string
@@ -22,6 +25,7 @@ type BrandCustomer struct {
 	IsNewCust     int64
 	HasFilled     bool
 
+	Status    string
 	CreatedAt time.Time `xorm:"created 'in_date_time'"`
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
@@ -63,6 +67,17 @@ func (u *BrandCustomer) Save() error {
 func (BrandCustomer) Get(brandCode, mobile string) (*BrandCustomer, error) {
 	user := BrandCustomer{}
 	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&user)
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, CustomerNotExistError
+	}
+	return &user, nil
+}
+
+func (BrandCustomer) GetByWxOpenID(brandCode, wxOpenID string) (*BrandCustomer, error) {
+	user := BrandCustomer{}
+	has, err := db.Where("wx_open_id = ?", wxOpenID).And("brand_code = ?", brandCode).Get(&user)
 	if err != nil {
 		return nil, err
 	} else if !has {

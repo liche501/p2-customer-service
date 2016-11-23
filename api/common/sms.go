@@ -15,6 +15,11 @@ import (
 	"github.com/smallnest/goreq"
 )
 
+const (
+	SMS_VERICATION_CODE_LENGTH               = 6
+	SMS_VERICATION_CODE_GENERATE_RETRY_COUNT = 5
+)
+
 type SmsResult struct {
 	Result string `json:"result"`
 	Msg    string `json:"msg"`
@@ -28,18 +33,9 @@ type Data struct {
 }
 
 func ApiSendSms(c echo.Context) error {
-	brandCode := ""
-	if c.FormValue("brandCode") == "mh" {
-		brandCode = "mh"
-	}
-	//  else {
-	// 	brandCode = strings.ToLower(mux.Vars(c)["tenantCode"])
-	// }
-
-	mobile := c.FormValue("mobile")
+	brandCode := c.QueryParam("brandCode")
+	mobile := c.QueryParam("mobile")
 	if mobile == "" {
-		// extends.ReturnJsonFailure(w, http.StatusBadRequest, 10012)
-		// return
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
 	verCode := createVerCode()
@@ -49,17 +45,16 @@ func ApiSendSms(c echo.Context) error {
 	if err != nil {
 		logs.Error.Println("Call sms api error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
+	}
 
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003, err[0].Error())
-		// return
-	} else if smsStr.Data.Flag != 0 {
+	if smsStr.Data.Flag != 0 {
 		logs.Error.Println("Call sms api error: ", smsStr.Data.Flag)
-		// extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10003, fmt.Sprintf("Flag == %v", smsStr.Data.Flag))
-		// return
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	}
+
 	msg := fmt.Sprintf("SMS %v %v %v ", brandCode, mobile, smsStr.Data.SmsCode)
 	logs.Succ.Println(msg)
+
 	var sms model.Sms
 	sms.BrandCode = brandCode
 	sms.Mobile = mobile
@@ -67,29 +62,25 @@ func ApiSendSms(c echo.Context) error {
 	sms.Type = "register"
 	sms.Create()
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: map[string]string{"status": "OK"}})
-	//extends.ReturnJsonSuccess(w, http.StatusOK, map[string]string{"status": "OK"})
 }
 
 func ApiCheckSms(c echo.Context) error {
 	// Verify SmsCode
 	var sms model.Sms
-	mobile := c.FormValue("mobile")
-	verCode := c.FormValue("verCode")
+	mobile := c.QueryParam("mobile")
+	verCode := c.QueryParam("verCode")
 	if mobile == "" || verCode == "" {
-		//extends.ReturnJsonFailure(w, http.StatusBadRequest, 10012)
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
 	result, err := sms.CheckVerCode(mobile, verCode)
 	if err != nil {
 		logs.Error.Println("Check sms error: ", err)
-		// //extends.ReturnJsonFailure(w, http.StatusInternalServerError, 10013)
-		// return
-
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 	return c.JSON(http.StatusOK, APIResult{Success: true, Result: map[string]bool{"flag": result}})
-	//extends.ReturnJsonSuccess(w, http.StatusOK, map[string]bool{"flag": result})
 }
+
+type SmsVerificationCode string
 
 var smsChannel chan int64 = make(chan int64, 32)
 
@@ -123,11 +114,10 @@ func Active(c echo.Context) error {
 }
 func createVerCode() string {
 	verCode := ""
-	for i := 0; i < 5; i++ {
+	for i := 0; i < SMS_VERICATION_CODE_GENERATE_RETRY_COUNT; i++ {
 		verCode = cutRandomCode()
 		result := checkRepeatSms(verCode)
 		if !result {
-			// logs.Debug.Println("ok ", verCode)
 			break
 		}
 		logs.Debug.Println(verCode, " is repeated")
@@ -138,7 +128,7 @@ func createVerCode() string {
 func cutRandomCode() string {
 	rd := RandInt64()
 	str := strconv.FormatInt(rd, 10)
-	strCut := str[0:6]
+	strCut := str[0:SMS_VERICATION_CODE_LENGTH]
 	return strCut
 }
 

@@ -32,7 +32,12 @@ func RouterInit() {
 	e.GET("/error2", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 10001, Message: "StatusBadRequest"}})
 	})
-
+	e.GET("/event",func(c echo.Context)error{
+		 aa := new(event.EventSender)
+		 aa.EventBrokerUrl = "http://localhost:9000"
+		 aa.SendEvent()
+		return c.JSON(http.StatusOK, APIResult{Success:true}})
+	})
 	e.GET("/token", func(c echo.Context) error {
 		token, _ := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
