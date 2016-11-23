@@ -172,19 +172,16 @@ func (FashionBrandCustomerInfo) GetByWxOpenID(brandCode, wxOpenId string) (*Fash
 }
 
 func (FashionBrandCustomerInfo) GetByWxOpenIDAndStatus(brandCode, wxOpenId, status string) (*FashionBrandCustomerInfo, error) {
-
-	u := FashionBrandCustomerInfo{}
-	has, err := db.Where("open_id = ?", wxOpenId).And("brand_code = ?", brandCode).And("regist_status = ?", status).Get(&u.FashionBrandCustomer)
+	var c FashionBrandCustomerInfo
+	has, err := db.Table("user").Join("INNER", "user_detail", "user_detail.user_id = user.id").
+		Join("INNER", "user_shop", "user_shop.user_id = user.id").
+		Where("user_shop.open_id = ?", wxOpenId).And("user_shop.brand_code = ?", brandCode).And("user_detail.status = ?", status).
+		Get(&c)
 	if err != nil {
 		return nil, err
-	} else if !has {
-		return nil, nil
 	}
-	has, err = db.Where("id = ?", u.FashionBrandCustomer.CustomerId).Get(&u.Customer)
-	if err != nil {
-		return nil, err
-	} else if !has {
-		return nil, nil
+	if !has {
+		return nil, CustomerNotExistError
 	}
-	return &u, nil
+	return &c, nil
 }
