@@ -54,6 +54,18 @@ func TestUserShopCURD(t *testing.T) {
 				}
 				So(err, ShouldBeNil)
 			})
+			Convey("Check FashionBrandCustomerInfo", func() {
+				c, err := FashionBrandCustomerInfo{}.GetByWxOpenID("tt", "oYiR6wV9swnxcaXrEkXDPLzt27Wg")
+				if err != nil {
+					fmt.Println("Check FashionBrandCustomerInfo Error: ", err)
+				} else {
+					fmt.Println("Check FashionBrandCustomerInfo: ", c)
+				}
+				fmt.Println("c.Customer:", c.Customer)
+				fmt.Println("c.FashionBrandCustomer:", c.FashionBrandCustomer)
+				fmt.Println("c.BC:", c.BC)
+				So(err, ShouldBeNil)
+			})
 		})
 
 		Convey("Change Mobile", func() {
