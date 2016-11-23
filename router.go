@@ -32,11 +32,13 @@ func RouterInit() {
 	e.GET("/error2", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 10001, Message: "StatusBadRequest"}})
 	})
-	e.GET("/event",func(c echo.Context)error{
-		 aa := new(event.EventSender)
-		 aa.EventBrokerUrl = "http://localhost:9000"
-		 aa.SendEvent()
-		return c.JSON(http.StatusOK, APIResult{Success:true}})
+	e.GET("/event/:eventType", func(c echo.Context) error {
+		aa := new(event.EventSender)
+		aa.EventBrokerUrl = "http://localhost:9000"
+		var payload interface{}
+		c.Bind(&payload)
+		aa.SendEvent("marketing", c.Param("eventType"), payload)
+		return c.JSON(http.StatusOK, APIResult{Success: true})
 	})
 	e.GET("/token", func(c echo.Context) error {
 		token, _ := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
@@ -59,7 +61,7 @@ func RouterInit() {
 	user.GET("/get_customer_info", extends.JWTMiddleware(fashion.APIGetCustomerInfo))
 	user.GET("/get_user_info", extends.JWTMiddleware(fashion.APIGetUserInfo))
 	user.POST("/update_perfect_info", extends.JWTMiddleware(fashion.APIUpdatePerfectInfo))
-	user.GET("/check_mobile", extends.JWTMiddleware(fashion.APICheckMobile))
+	user.GET("/check_mobile", extends.JWTMiddleware(fashion.APICheckMobileAvailableForRegister))
 	user.GET("/get_member_info", extends.JWTMiddleware(fashion.APIGetMemberInfo))
 
 	//Coupon
