@@ -1,6 +1,7 @@
 {
 	"DB": {
-		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/customer_service?charset=utf8&parseTime=True&loc=UTC"
+
 	},
 	"Contents": {
 		"ServiceHost": "139.196.228.246",
