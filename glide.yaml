@@ -1,7 +1,0 @@
-package: best/p2-customer-service
-import:
-- package: github.com/dgrijalva/jwt-go
-- package: github.com/labstack/echo
-  subpackages:
-  - middleware
-- package: github.com/smallnest/goreq
