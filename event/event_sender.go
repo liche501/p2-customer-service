@@ -32,6 +32,7 @@ func (s *EventSender) SendEvent(streamName, eventType string, payload interface{
 
 	client := &http.Client{}
 	url := fmt.Sprintf("%s/v1/streams/%s/events/%s", s.EventBrokerUrl, streamName, eventType)
+	logs.Debug.Println(url)
 	logs.Debug.Println("GetUserDetail error: ", err)
 	request, err := http.NewRequest("POST", url, bytes.NewReader(data))
 	request.Header.Set("Content-Type", "application/json")

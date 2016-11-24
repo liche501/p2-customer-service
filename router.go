@@ -4,6 +4,7 @@ import (
 	"best/p2-customer-service/api/common"
 	"best/p2-customer-service/api/fashion"
 	"best/p2-customer-service/event"
+	"best/p2-customer-service/logs"
 
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/extends"
@@ -34,10 +35,14 @@ func RouterInit() {
 	})
 	e.GET("/event/:eventType", func(c echo.Context) error {
 		aa := new(event.EventSender)
-		aa.EventBrokerUrl = "http://localhost:9000"
+		// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+		aa.EventBrokerUrl = "http://staging.p2shop.cn:50110"
 		var payload interface{}
 		c.Bind(&payload)
-		aa.SendEvent("marketing", c.Param("eventType"), payload)
+		err := aa.SendEvent("marketing", "BrandCustomerInitiated", payload)
+		if err != nil {
+			logs.Error.Println(err)
+		}
 		return c.JSON(http.StatusOK, APIResult{Success: true})
 	})
 	e.GET("/token", func(c echo.Context) error {
