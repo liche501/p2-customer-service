@@ -6,6 +6,7 @@ import (
 	"best/p2-customer-service/extends"
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
+	"best/p2-customer-service/event"
 	"errors"
 	"fmt"
 	"strconv"
@@ -44,12 +45,10 @@ func APICheckMobileAvailableForRegister(c echo.Context) error {
 
 // curl -X POST -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJicmFuZENvZGUiOiJyYyIsIm9wZW5JZCI6Im9ZaVI2d1R6NmFucjVLcGlSSC1tUmNwdnZMUGMiLCJtb2JpbGUiOiIxMzY5MTE5NDIyMyIsImN1c3RObyI6IjAwMDE4NTIzNTkiLCJleHAiOjE0ODAwNjQ2NDIsImlzcyI6ImxpY2hlIn0.huxuvLITetwHzdpZHX-T_sfZe0rEeMM_2DOnugdUjRo" -H "Cache-Control: no-cache" -H "Postman-Token: 28bf6f4d-9809-26a2-3229-4a177c8d29cf" "http://localhost:9000/api/v1/fashion/user/register?mobile=13691194223&verCode=1234"
 func APIRegister(c echo.Context) error {
-
 	mobile := c.QueryParam("mobile")
 	verCode := c.QueryParam("verCode")
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
-
 	if verCode == "" || mobile == "" || openId == "" || brandCode == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
@@ -79,16 +78,28 @@ func APIRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
+	//sendEvent
+		et := new(event.EventSender)
+		// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+		et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+		var payload interface{}
+		c.Bind(&payload)
+		err := et.SendEvent("marketing", "BrandCustomerInitiated", payload)
+		if err != nil {
+			logs.Error.Println(err)
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+		logs.Debug.Println(1111)
 	//UpdateStatus BrandCustomerInitiated
-	// bc := model.BrandCustomer{}
-	// bc.BrandCode = brandCode
-	// bc.CustomerId = e.CustomerID
-	// bc.Status = "BrandCustomerInitiated"
-	// err := bc.UpdateStatus()
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// 	return echo.NewHTTPError(http.StatusInternalServerError, err)
-	// }
+	bc := model.BrandCustomer{}
+	bc.BrandCode = brandCode
+	bc.CustomerId =1 //e.CustomerID
+	bc.Status = "BrandCustomerInitiated"
+	err = bc.UpdateStatus()
+	if err != nil {
+		logs.Error.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
 
 	// WillDo:: sendEvent => BrandCustomerConfirmed
 
