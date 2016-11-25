@@ -115,8 +115,6 @@ func APIRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	// WillDo:: sendEvent => BrandCustomerConfirmed
-
 	return c.JSON(http.StatusOK, APIResult{Success: true})
 
 }

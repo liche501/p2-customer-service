@@ -3,7 +3,6 @@ package event
 import (
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
-	"net/http"
 
 	"encoding/json"
 	"fmt"
@@ -57,6 +56,13 @@ func ApiHandleEvent(c echo.Context) error {
 func (e *BrandCustomerConfirmed) Handle() error {
 	logs.Warning.Println("BrandCustomerConfirmed ative")
 	logs.Warning.Println(e)
+
+	//WillDo:: SendCoupon
+	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// }
+
 	bc := model.BrandCustomer{}
 	bc.BrandCode = e.BrandCode
 	bc.CustomerId = e.CustomerID
@@ -67,24 +73,14 @@ func (e *BrandCustomerConfirmed) Handle() error {
 		logs.Error.Println(err)
 		return err
 	}
-	//WillDo:: SendCoupon
-	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// }
 
-	//sendEvent
-	et := new(EventSender)
-	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
-	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
-	obj := BrandCustomerCreated{}
-	obj.CustomerID = e.CustomerID
-	obj.BrandCode = e.BrandCode
-
-	err = et.SendEvent("marketing", "BrandCustomerInitiated", obj)
-	if err != nil {
+	//sendEvent BrandCustomerCreated
+	brandCustomerCreated := BrandCustomerCreated{}
+	brandCustomerCreated.BrandCode = e.BrandCode
+	brandCustomerCreated.CustNo = e.BrandCode
+	brandCustomerCreated.CustomerID = e.CustomerID
+	if err := brandCustomerCreated.Handle(); err != nil {
 		logs.Error.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return nil
 }
@@ -92,6 +88,8 @@ func (e *BrandCustomerConfirmed) Handle() error {
 func (e *BrandCustomerCreated) Handle() error {
 	logs.Warning.Println("BrandCustomerCreated ative")
 	logs.Warning.Println(e)
+
+	//WillDo:: SendCoupon from wcs
 
 	bc := model.BrandCustomer{}
 	bc.BrandCode = e.BrandCode
