@@ -46,19 +46,16 @@ func (c *Customer) Create() error {
 	if err != nil {
 		return err
 	}
-	if customer != nil {
-		return errors.New("Customer is exists")
-	}
-
-	if affected, err := db.InsertOne(c); err != nil {
-		return err
-	} else if affected == 0 {
-		return errors.New("Affected rows : 0")
-	}
 
 	// WillDO:: This is illogic. Have to change this logic.
 	if customer != nil {
 		if affected, err := db.Id(customer.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(c.Id, 10)}); err != nil {
+			return err
+		} else if affected == 0 {
+			return errors.New("Affected rows : 0")
+		}
+	} else {
+		if affected, err := db.InsertOne(c); err != nil {
 			return err
 		} else if affected == 0 {
 			return errors.New("Affected rows : 0")

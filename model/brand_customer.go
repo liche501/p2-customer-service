@@ -43,27 +43,17 @@ func (bc *BrandCustomer) Create() error {
 	if err != nil {
 		return err
 	}
+
 	if brandCustomer == nil {
-		return errors.New("BrandCustomer is exist")
-	}
-	if brandCustomer != nil {
-		affected, err := db.Id(brandCustomer.Id).AllCols().Update(bc)
+		affected, err := db.InsertOne(bc)
 		if err != nil {
 			return err
 		}
 		if affected == 0 {
 			return errors.New("Affected rows : 0")
 		}
-		return nil
 	}
 
-	affected, err := db.InsertOne(bc)
-	if err != nil {
-		return err
-	}
-	if affected == 0 {
-		return errors.New("Affected rows : 0")
-	}
 	return nil
 }
 
