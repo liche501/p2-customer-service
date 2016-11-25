@@ -72,9 +72,9 @@ func (e *BrandCustomerConfirmed) Handle() error {
 
 	//SendCoupon
 
-	if err := SendCoupon(e.BrandCode, e.CustNo); err != nil {
-		logs.Error.Println(err)
-	}
+	// if err := SendCoupon(e.BrandCode, e.CustNo); err != nil {
+	// 	logs.Error.Println(err)
+	// }
 
 	//sendEvent BrandCustomerCreated
 	// brandCustomerCreated := BrandCustomerCreated{}
