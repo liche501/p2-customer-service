@@ -1,16 +1,17 @@
 package model
 
 import (
-	"errors"
+	"net/http"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/labstack/echo"
 )
 
 var (
-	CustomerNotExistError          = errors.New("User not exists")
-	BrandCustomerAlreadyExistError = errors.New("BrandCustomer already exists")
+	CustomerNotExistError          = echo.NewHTTPError(http.StatusInternalServerError, 20003)
+	BrandCustomerAlreadyExistError = echo.NewHTTPError(http.StatusInternalServerError, 20014)
 )
 
 var db *xorm.Engine

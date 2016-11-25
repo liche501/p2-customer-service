@@ -86,7 +86,7 @@ func RouterInit() {
 
 	user.POST("/register", fashion.APIRegister)
 	user.GET("/login", fashion.APILogin)
-	user.GET("/get_customer_info", fashion.APIGetCustomerInfo)
+	user.GET("/brand_customer_status", fashion.APIBrandCustomerStatus)
 	user.GET("/get_user_info", fashion.APIGetUserInfo)
 	user.POST("/update_perfect_info", fashion.APIUpdatePerfectInfo)
 	user.GET("/check_mobile", fashion.APICheckMobileAvailableForRegister)

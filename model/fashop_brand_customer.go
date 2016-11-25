@@ -35,7 +35,7 @@ func (FashionBrandCustomer) GetByWxOpenID(brandCode, wxOpenID string) (*FashionB
 	}
 
 	if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 
 	return &c, nil
@@ -58,7 +58,7 @@ func (FashionBrandCustomer) GetByCustomerID(brandCode string, customerID int64) 
 	}
 
 	if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 
 	return &c, nil
@@ -78,20 +78,21 @@ func (fbci *FashionBrandCustomerInfo) Create() error {
 	//WillDo: this logic have to change
 	// return if exist
 	fashionBrandCustomer, err := FashionBrandCustomer{}.GetByWxOpenID(fbci.FashionBrandCustomer.BrandCode, fbci.FashionBrandCustomer.WxOpenID)
-	if err != nil && err != CustomerNotExistError {
+	if err != nil {
 		return err
 	}
 	if fashionBrandCustomer != nil {
-		return BrandCustomerAlreadyExistError
+		return errors.New("BrandCustomer  exists")
+
 	}
 
 	// check Customer exist
 	customer, err := Customer{}.GetByMobile(fbci.Customer.Mobile)
-	if err != nil && err != CustomerNotExistError {
+	if err != nil {
 		return err
 	}
 	if customer == nil {
-		if err := fbci.Customer.Create(); err != nil && err != CustomerNotExistError {
+		if err := fbci.Customer.Create(); err != nil {
 			return err
 		}
 		customer = &fbci.Customer
@@ -99,7 +100,7 @@ func (fbci *FashionBrandCustomerInfo) Create() error {
 
 	// create BrandCustomer
 	brandCustomer, err := BrandCustomer{}.Get(fbci.FashionBrandCustomer.BrandCode, fbci.Mobile)
-	if err != nil && err != CustomerNotExistError {
+	if err != nil {
 		return err
 	}
 
@@ -166,7 +167,7 @@ func (FashionBrandCustomerInfo) GetByWxOpenID(brandCode, wxOpenId string) (*Fash
 		return nil, err
 	}
 	if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 	return &c, nil
 }
@@ -182,7 +183,7 @@ func (FashionBrandCustomerInfo) GetSuccessUserByWxOpenID(brandCode, wxOpenId str
 		return nil, err
 	}
 	if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 	return &c, nil
 }

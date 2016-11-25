@@ -40,8 +40,11 @@ func (bc *BrandCustomer) Create() error {
 	defer mutex.Unlock()
 
 	brandCustomer, err := BrandCustomer{}.Get(bc.BrandCode, bc.Mobile)
-	if err != nil && err != CustomerNotExistError {
+	if err != nil {
 		return err
+	}
+	if brandCustomer == nil {
+		return errors.New("BrandCustomer is exist")
 	}
 	if brandCustomer != nil {
 		affected, err := db.Id(brandCustomer.Id).AllCols().Update(bc)
@@ -70,8 +73,11 @@ func (bc *BrandCustomer) Update() error {
 	defer mutex.Unlock()
 
 	brandCustomer, err := BrandCustomer{}.Get(bc.BrandCode, bc.Mobile)
-	if err != nil && err != CustomerNotExistError {
+	if err != nil {
 		return err
+	}
+	if brandCustomer == nil {
+		return errors.New("BrandCustomer not exist")
 	}
 
 	affected, err := db.Id(brandCustomer.Id).Cols("name", "mobile", "gender", "birthday", "address", "detail_address", "email", "is_married").Update(bc)
@@ -90,7 +96,7 @@ func (BrandCustomer) Get(brandCode, mobile string) (*BrandCustomer, error) {
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 	return &brandCustomer, nil
 }
@@ -101,7 +107,7 @@ func (BrandCustomer) GetByWxOpenID(brandCode, wxOpenID string) (*BrandCustomer, 
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, CustomerNotExistError
+		return nil, nil
 	}
 	return &brandCustomer, nil
 }

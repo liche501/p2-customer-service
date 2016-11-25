@@ -28,15 +28,15 @@ func APICheckMobileAvailableForRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
 
-	_, err := model.FashionBrandCustomer{}.GetByMobile(brandCode, mobile)
-	if err != nil && err != model.CustomerNotExistError {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	fbc, err := model.FashionBrandCustomer{}.GetByMobile(brandCode, mobile)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
-	if err == model.CustomerNotExistError {
+	if fbc == nil {
 		return c.JSON(http.StatusOK, APIResult{Success: true})
 	}
-
-	return c.JSON(http.StatusOK, APIResult{Success: false})
+	return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20007, Message: "Mobile already registered"}})
 }
 
 // curl -X POST -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJicmFuZENvZGUiOiJyYyIsIm9wZW5JZCI6Im9ZaVI2d1R6NmFucjVLcGlSSC1tUmNwdnZMUGMiLCJtb2JpbGUiOiIxMzY5MTE5NDIyMyIsImN1c3RObyI6IjAwMDE4NTIzNTkiLCJleHAiOjE0ODAwNjQ2NDIsImlzcyI6ImxpY2hlIn0.huxuvLITetwHzdpZHX-T_sfZe0rEeMM_2DOnugdUjRo" -H "Cache-Control: no-cache" -H "Postman-Token: 28bf6f4d-9809-26a2-3229-4a177c8d29cf" "http://localhost:9000/api/v1/fashion/user/register?mobile=13691194223&verCode=1234"
@@ -78,9 +78,11 @@ func APIRegister(c echo.Context) error {
 	brandCustomer, err := model.BrandCustomer{}.Get(brandCode, mobile)
 	if err != nil {
 		logs.Error.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
-
+	if brandCustomer == nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, 20015)
+	}
 	//sendEvent BrandCustomerInitiated
 	et := new(event.EventSender)
 	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
@@ -103,7 +105,7 @@ func APIRegister(c echo.Context) error {
 
 	if err := brandCustomer.UpdateStatus(); err != nil {
 		logs.Error.Println(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 	logs.Succ.Println("BrandCustomerInitiated is send")
 
@@ -117,24 +119,27 @@ func APILogin(c echo.Context) error {
 	if openId == "" || brandCode == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
+	logs.Warning.Println(brandCode, openId)
 
 	fbci, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	}
+	if fbci == nil {
+		c.JSON(http.StatusOK, APIResult{Success: false})
 	}
 
 	jsonWebToken, err := extends.AuthHandler(brandCode, openId, fbci.Customer.Mobile, fbci.FashionBrandCustomer.CustNo)
 	if err != nil {
 		return err
 	}
-	logs.Warning.Println("Create JsonWebToken: ", jsonWebToken)
+	logs.Succ.Println("Create JsonWebToken: ", jsonWebToken)
 	rs := APIResult{Success: true, Result: map[string]string{"token": jsonWebToken, "status": fbci.Status()}}
 	return c.JSON(http.StatusOK, rs)
-
 }
 
-// APIGetCustomerInfo SSE 获取顾客信息
-func APIGetCustomerInfo(c echo.Context) error {
+// APIBrandCustomerStatus SSE
+func APIBrandCustomerStatus(c echo.Context) error {
 	openId := c.Get("user").(*extends.AuthClaims).OpenId
 	brandCode := c.Get("user").(*extends.AuthClaims).BrandCode
 	if openId == "" || brandCode == "" {
@@ -151,9 +156,8 @@ func APIGetCustomerInfo(c echo.Context) error {
 		logs.Error.Println("GetByOpenidWithoutResgitStatus error: ", err)
 		return c.String(http.StatusOK, "data:nouser\n\nexist")
 	}
-
 	if fbci == nil {
-		return c.String(http.StatusOK, "data:nouser\n\n")
+		return c.String(http.StatusOK, "data:nouser\n\nexist")
 	}
 
 	logs.Debug.Printf("RegistStatus for openId %v: %v", openId, fbci.Status)
@@ -181,14 +185,20 @@ func APIGetUserInfo(c echo.Context) error {
 	fbci, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
 	if err != nil {
 		logs.Error.Println("GetByOpenid error: ", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	}
+	if fbci == nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, 20003)
 	}
 
 	// If need perfect user info
 	bc, err := model.BrandCustomer{}.Get(fbci.FashionBrandCustomer.BrandCode, fbci.Customer.Mobile)
 	if err != nil {
 		logs.Error.Println("GetUserDetail error: ", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	}
+	if bc == nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, 20015)
 	}
 	needPerfect := bc == nil || !bc.HasFilled
 
@@ -215,6 +225,9 @@ func APIGetMemberInfo(c echo.Context) error {
 		logs.Error.Println("GetUserDetail error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
+	if bcFromDB == nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, 20015)
+	}
 
 	bc, err := getUserDetailFromCSL(bcFromDB)
 	if err != nil {
@@ -235,7 +248,11 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 	brandCustomer, err := model.BrandCustomer{}.Get(brandCode, oldMobile)
 	if err != nil {
 		logs.Error.Println(err)
-		echo.NewHTTPError(http.StatusInternalServerError, err)
+		echo.NewHTTPError(http.StatusInternalServerError, 10013)
+	}
+	if brandCustomer == nil {
+		echo.NewHTTPError(http.StatusInternalServerError, 20015)
+
 	}
 
 	brandCustomer.WxOpenID = openId

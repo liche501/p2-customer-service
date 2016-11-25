@@ -16,15 +16,18 @@
     "20000":"Miss token",
     "20001":"Token invalid",
     "20002":"Failed create token",
-    "20003":"User does not exists",
+    "20003":"Customer not exists",
     "20004":"Username or password error",
     "20005":"Captcha error",
     "20006":"Sms code error",
-    "20007":"Mobile already registered",
+    "20007":"Mobile registered",
     "20008":"Mobile has been used",
     "20009":"Email has been used",
     "20010":"GivenName has been used",
     "20011":"Password format incorrect",
     "20012":"Old password error",
-    "20013":"Find password times over limit"
+    "20013":"Find password times over limit",
+    "20014":"BrandCustomer exists",
+    "20015":"BrandCustomer not exists"
+    
 }
