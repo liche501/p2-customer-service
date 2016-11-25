@@ -111,7 +111,7 @@ func (fbci *FashionBrandCustomerInfo) Create() error {
 			BrandCode:  fbci.FashionBrandCustomer.BrandCode,
 			Status:     "CustomerCreated",
 		}
-		if err := brandCustomer.Save(); err != nil {
+		if err := brandCustomer.Create(); err != nil {
 			return err
 		}
 	}

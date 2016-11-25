@@ -34,7 +34,7 @@ func (BrandCustomer) TableName() string {
 	return "user_detail"
 }
 
-func (bc *BrandCustomer) Save() error {
+func (bc *BrandCustomer) Create() error {
 	var mutex sync.Mutex
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -64,6 +64,26 @@ func (bc *BrandCustomer) Save() error {
 	return nil
 }
 
+func (bc *BrandCustomer) Update() error {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	brandCustomer, err := BrandCustomer{}.Get(bc.BrandCode, bc.Mobile)
+	if err != nil && err != CustomerNotExistError {
+		return err
+	}
+
+	affected, err := db.Id(brandCustomer.Id).Cols("name", "mobile", "gender", "birthday", "address", "detail_address", "email", "is_married").Update(bc)
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("Affected rows : 0")
+	}
+	return nil
+
+}
 func (BrandCustomer) Get(brandCode, mobile string) (*BrandCustomer, error) {
 	brandCustomer := BrandCustomer{}
 	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&brandCustomer)

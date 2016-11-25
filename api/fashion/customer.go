@@ -228,16 +228,12 @@ func APIGetMemberInfo(c echo.Context) error {
 		logs.Error.Println("GetUserDetail error: ", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
-	// 完善顾客信息上线前注册的用户
-	if bc == nil {
-		bc = &model.BrandCustomer{}
-		bc.HasFilled = false
-	}
+
 	bc = getUserDetailFromCSL(brandCode, openId, bc, bc.HasFilled)
 
 	result := make(map[string]interface{})
 	if bc != nil {
-		result["mobile"] = mobile
+		result["mobile"] = bc.Mobile
 		result["name"] = bc.Name
 		result["gender"] = bc.Gender
 		result["birthday"] = bc.Birthday
@@ -304,7 +300,7 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 		}
 	} else {
-		err = brandCustomer.Save()
+		err = brandCustomer.Update()
 		if err != nil {
 			logs.Error.Println("[UpdatePerfectInfo]saveUserDetail", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, 10013)
@@ -320,7 +316,7 @@ func APIUpdatePerfectInfo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 
-	return c.JSON(http.StatusOK, APIResult{Success: true, Result: map[string]string{"openId": openId}})
+	return c.JSON(http.StatusOK, APIResult{Success: true})
 
 }
 
