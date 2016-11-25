@@ -1,7 +1,6 @@
 package event
 
 import (
-	"best/p2-customer-service/api/fashion"
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
 
@@ -68,10 +67,10 @@ func (e *BrandCustomerConfirmed) Handle() error {
 		return err
 	}
 	//WillDo:: SendCoupon
-	err = fashion.SendCoupon(e.BrandCode, e.CustNo)
-	if err != nil {
-		logs.Error.Println(err)
-	}
+	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// }
 	return nil
 }
 

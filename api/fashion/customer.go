@@ -78,22 +78,31 @@ func APIRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
+	//check customer regist success
+	brandCustomer, err := model.BrandCustomer{}.Get(brandCode, mobile)
+	if err != nil {
+		logs.Error.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
 	//sendEvent
 	et := new(event.EventSender)
 	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
 	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
 	obj := event.BrandCustomerInitiated{}
+	obj.CustomerID = brandCustomer.CustomerId
 	obj.Telephone = mobile
 	obj.Password = "123456"
 	obj.BrandCode = brandCode
 	obj.WxOpenID = openId
 	// var payload interface{}
 	c.Bind(&obj)
-	err := et.SendEvent("marketing", "BrandCustomerInitiated", obj)
+	err = et.SendEvent("marketing", "BrandCustomerInitiated", obj)
 	if err != nil {
 		logs.Error.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
+
 	logs.Debug.Println("1111")
 	//UpdateStatus BrandCustomerInitiated
 	bc := model.BrandCustomer{}
