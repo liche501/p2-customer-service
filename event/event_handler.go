@@ -3,6 +3,7 @@ package event
 import (
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
+	"net/http"
 
 	"encoding/json"
 	"fmt"
@@ -71,6 +72,20 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	// if err != nil {
 	// 	logs.Error.Println(err)
 	// }
+
+	//sendEvent
+	et := new(EventSender)
+	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+	obj := BrandCustomerCreated{}
+	obj.CustomerID = e.CustomerID
+	obj.BrandCode = e.BrandCode
+
+	err = et.SendEvent("marketing", "BrandCustomerInitiated", obj)
+	if err != nil {
+		logs.Error.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
 	return nil
 }
 
@@ -78,6 +93,15 @@ func (e *BrandCustomerCreated) Handle() error {
 	logs.Warning.Println("BrandCustomerCreated ative")
 	logs.Warning.Println(e)
 
+	bc := model.BrandCustomer{}
+	bc.BrandCode = e.BrandCode
+	bc.CustomerId = e.CustomerID
+	bc.Status = "BrandCustomerCreated"
+	err := bc.UpdateStatus()
+	if err != nil {
+		logs.Error.Println(err)
+		return err
+	}
 	return nil
 }
 
