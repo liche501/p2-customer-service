@@ -2,6 +2,8 @@ package main
 
 import (
 	"best/p2-customer-service/config"
+	. "best/p2-customer-service/dto"
+	"best/p2-customer-service/extends"
 	"best/p2-customer-service/model"
 
 	"fmt"
@@ -12,7 +14,8 @@ import (
 )
 
 var (
-	e = echo.New()
+	ERROR_MESSAGE_NEED_CONVERT = 5
+	e                          = echo.New()
 )
 
 func main() {
@@ -61,6 +64,7 @@ func main() {
 	RouterInit()
 	config.InitConfig()
 	model.InitDB("mysql", config.Config.DB.Conn)
+	extends.InitErrorList()
 
 	// e.Logger.Fatal(e.Start(":9000"))
 	e.Start(":9000")
@@ -92,9 +96,17 @@ func JSONHTTPErrorHandler(err error, c echo.Context) {
 		msg = he.Message
 	}
 	if !c.Response().Committed {
-		c.JSON(code, map[string]interface{}{
-			"statusCode": code,
-			"message":    msg,
-		})
+		if len(msg) == ERROR_MESSAGE_NEED_CONVERT {
+			c.JSON(code, APIResult{Error: APIError{
+				Code:    code,
+				Message: extends.ErrorList[msg],
+			}})
+		} else {
+			c.JSON(code, map[string]interface{}{
+				"statusCode": code,
+				"message":    msg,
+			})
+		}
+
 	}
 }

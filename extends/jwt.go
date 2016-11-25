@@ -48,9 +48,10 @@ func AuthHandler(brandCode, openId, mobile, custNo string) (string, error) {
 
 	jsonWebToken, err := jwtToken.SignedString(privKey)
 	if err != nil {
-		return "", err
+		logs.Error.Println("create jwtToken: ", err)
+		return "", echo.NewHTTPError(http.StatusInternalServerError, 20002)
 	}
-	return jsonWebToken, err
+	return jsonWebToken, nil
 }
 
 func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -60,7 +61,7 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if len(jwtValue) == 0 || jwtValue == "null" {
 			logs.Warning.Println("jwt_token is empty")
-			return echo.NewHTTPError(http.StatusForbidden, "20001")
+			return echo.NewHTTPError(http.StatusForbidden, "20000")
 		}
 		var defaultKeyFunc jwt.Keyfunc = func(*jwt.Token) (interface{}, error) {
 			return privKey, nil

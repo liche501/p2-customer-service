@@ -28,10 +28,10 @@ func RouterInit() {
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: "aaaaaaa"})
 	})
 	e.GET("/error", func(c echo.Context) error {
-		return echo.NewHTTPError(http.StatusInternalServerError, "10003", " error01")
+		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	})
 	e.GET("/error2", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 10001, Message: "StatusBadRequest"}})
+		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 400, Message: "StatusBadRequest"}})
 	})
 	e.GET("/event/:eventType", func(c echo.Context) error {
 		aa := new(event.EventSender)
@@ -46,7 +46,10 @@ func RouterInit() {
 		return c.JSON(http.StatusOK, APIResult{Success: true})
 	})
 	e.GET("/token", func(c echo.Context) error {
-		token, _ := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
+		token, err := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
+		if err == nil {
+			return err
+		}
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
 	})
 	t := e.Group("/jwt")
@@ -58,8 +61,26 @@ func RouterInit() {
 
 	api := e.Group("/api")
 	v1 := api.Group("/v1")
+
+	// Common
+	c := v1.Group("/common")
+	c.POST("/events", event.ApiHandleEvent)
+
+	s := c.Group("/sms")
+	s.GET("/code", common.ApiSendSms)
+	s.GET("/success", common.ApiCheckSms)
+	s.GET("/active", common.Active)
+
+	p := c.Group("/captcha")
+	p.GET("/key", common.APIGetCaptchaKey)
+	p.GET("/image", demo)
+	p.GET("/success", common.ApiCheckCaptcha)
+
+	a := c.Group("/auth")
+	a.GET("/set_auth", demo)
+
 	fa := v1.Group("/fashion")
-	fa.Use(extends.JWTMiddleware)
+	fa.Use(extends.JWTMiddleware) //********** important check JWT prefix /fashion  *****
 	//User
 	user := fa.Group("/user")
 
@@ -82,20 +103,4 @@ func RouterInit() {
 	in.GET("/grade", fashion.ApiGetVipGrade)
 	in.GET("/update_integral_exchange", fashion.ApiUpdateIntegralExchange)
 
-	// Common
-	c := v1.Group("/common")
-	s := c.Group("/sms")
-	s.GET("/code", common.ApiSendSms)
-	s.GET("/success", common.ApiCheckSms)
-	s.GET("/active", common.Active)
-
-	p := c.Group("/captcha")
-	p.GET("/key", common.APIGetCaptchaKey)
-	p.GET("/image", demo)
-	p.GET("/success", common.ApiCheckCaptcha)
-
-	a := c.Group("/auth")
-	a.GET("/set_auth", demo)
-
-	c.POST("/events", event.ApiHandleEvent)
 }
