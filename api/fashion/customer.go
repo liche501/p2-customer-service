@@ -3,10 +3,10 @@ package fashion
 import (
 	"best/p2-customer-service/config"
 	. "best/p2-customer-service/dto"
+	"best/p2-customer-service/event"
 	"best/p2-customer-service/extends"
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
-	"best/p2-customer-service/event"
 	"errors"
 	"fmt"
 	"strconv"
@@ -79,21 +79,26 @@ func APIRegister(c echo.Context) error {
 	}
 
 	//sendEvent
-		et := new(event.EventSender)
-		// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
-		et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
-		var payload interface{}
-		c.Bind(&payload)
-		err := et.SendEvent("marketing", "BrandCustomerInitiated", payload)
-		if err != nil {
-			logs.Error.Println(err)
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
-		}
-		logs.Debug.Println(1111)
+	et := new(event.EventSender)
+	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+	obj := event.BrandCustomerInitiated{}
+	obj.Telephone = mobile
+	obj.Password = "123456"
+	obj.BrandCode = brandCode
+	obj.WxOpenID = openId
+	// var payload interface{}
+	c.Bind(&obj)
+	err := et.SendEvent("marketing", "BrandCustomerInitiated", obj)
+	if err != nil {
+		logs.Error.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	logs.Debug.Println("1111")
 	//UpdateStatus BrandCustomerInitiated
 	bc := model.BrandCustomer{}
 	bc.BrandCode = brandCode
-	bc.CustomerId =1 //e.CustomerID
+	bc.CustomerId = 1 //e.CustomerID
 	bc.Status = "BrandCustomerInitiated"
 	err = bc.UpdateStatus()
 	if err != nil {

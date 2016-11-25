@@ -29,8 +29,10 @@ type CustomerCreated struct {
 
 type BrandCustomerInitiated struct {
 	CustomerID int64     `json:"customerId"`
+	Telephone  string    `json:"telephone"`
+	Password   string    `json:"password"`
 	BrandCode  string    `json:"brandCode"`
-	WxOpenID   string    `json:"wxOpenId"`
+	WxOpenID   string    `json:"openId"`
 	CreatedAt  time.Time `json:"createdAt"`
 }
 
@@ -38,6 +40,7 @@ type BrandCustomerConfirmed struct {
 	CustomerID int64     `json:"customerId"`
 	BrandCode  string    `json:"brandCode"`
 	CustNo     string    `json:"custNo"`
+	Telephone  string    `json:"telephone"`
 	CreatedAt  time.Time `json:"createdAt"`
 }
 
