@@ -1,14 +1,17 @@
 package event
 
 import (
+	"best/p2-customer-service/config"
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
+	"strings"
 
 	"encoding/json"
 	"fmt"
 	"reflect"
 
 	"github.com/labstack/echo"
+	"github.com/smallnest/goreq"
 )
 
 type EventHandler interface {
@@ -57,39 +60,50 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	logs.Warning.Println("BrandCustomerConfirmed ative")
 	logs.Warning.Println(e)
 
-	//WillDo:: SendCoupon
-	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// }
+	bc := model.BrandCustomer{}
+	bc.BrandCode = e.BrandCode
+	bc.CustomerId = e.CustomerID
+	bc.Status = "BrandCustomerConfirmed"
+	bc.CustNo = e.CustNo
+	err := bc.UpdateStatusAndCustNo()
+	if err != nil {
+		logs.Error.Println(err)
+		return err
+	}
 
-	// bc := model.BrandCustomer{}
-	// bc.BrandCode = e.BrandCode
-	// bc.CustomerId = e.CustomerID
-	// bc.Status = "BrandCustomerConfirmed"
-	// bc.CustNo = e.CustNo
-	// err := bc.UpdateStatusAndCustNo()
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// 	return err
-	// }
+	//SendCoupon
+
+	if err := SendCoupon(e.BrandCode, e.CustNo); err != nil {
+		logs.Error.Println(err)
+	}
 
 	//sendEvent BrandCustomerCreated
-	brandCustomerCreated := BrandCustomerCreated{}
-	brandCustomerCreated.BrandCode = e.BrandCode
-	brandCustomerCreated.CustNo = e.BrandCode
-	brandCustomerCreated.CustomerID = e.CustomerID
-	if err := brandCustomerCreated.Handle(); err != nil {
+	// brandCustomerCreated := BrandCustomerCreated{}
+	// brandCustomerCreated.BrandCode = e.BrandCode
+	// brandCustomerCreated.CustNo = e.BrandCode
+	// brandCustomerCreated.CustomerID = e.CustomerID
+	// es := new(EventSender)
+	// es.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+	// err := es.SendEvent("marketing", "BrandCustomerCreated", brandCustomerCreated)
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// }
+
+	bc := model.BrandCustomer{}
+	bc.BrandCode = e.BrandCode
+	bc.CustomerId = e.CustomerID
+	bc.Status = "BrandCustomerCreated"
+	err := bc.UpdateStatus()
+	if err != nil {
 		logs.Error.Println(err)
+		return err
 	}
 	return nil
 }
 
 func (e *BrandCustomerCreated) Handle() error {
-	logs.Warning.Println("BrandCustomerCreated ative")
-	logs.Warning.Println(e)
-
-	//WillDo:: SendCoupon from wcs
+	// logs.Warning.Println("BrandCustomerCreated ative")
+	// logs.Warning.Println(e)
 
 	// bc := model.BrandCustomer{}
 	// bc.BrandCode = e.BrandCode
@@ -131,5 +145,18 @@ func (e *BrandCustomerDuplicated) Handle() error {
 		logs.Error.Println(err)
 		return err
 	}
+	return nil
+}
+
+func SendCoupon(brandCode, custNo string) error {
+	url := config.Config.Adapter.CSL.CustomerInterfaceAPI + "/" + strings.ToUpper(brandCode) + custNo + "/Coupons"
+	logs.Debug.Println("[SendCoupon]url", url)
+	_, textData, reqErr := goreq.New().Post(url).SetCurlCommand(true).End()
+	if reqErr != nil || textData == "" {
+		logs.Error.Println("reqErr", len(reqErr), " textData:", textData)
+		return reqErr[0]
+	}
+	logs.Succ.Println("[SendCoupon] success", textData)
+
 	return nil
 }

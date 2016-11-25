@@ -145,17 +145,3 @@ func (Coupon) Decompose(map_data []Coupon) map[string][]Coupon {
 	logs.Debug.Println("useList_cout:", len(container["useList"]))
 	return container
 }
-
-func SendCoupon(brandCode, custNo string) error {
-
-	url := config.Config.Adapter.CSL.CustomerInterfaceAPI + "/" + strings.ToUpper(brandCode) + custNo + "/Coupons"
-	logs.Debug.Println("[SendCoupon]url", url)
-	_, textData, reqErr := goreq.New().Post(url).SetCurlCommand(true).End()
-	if reqErr != nil || textData == "" {
-		logs.Error.Println("reqErr", len(reqErr), " textData:", textData)
-		return reqErr[0]
-	}
-	logs.Succ.Println("[SendCoupon] success", textData)
-
-	return nil
-}
