@@ -2,7 +2,6 @@ package event
 
 import (
 	"best/p2-customer-service/logs"
-	"best/p2-customer-service/model"
 
 	"encoding/json"
 	"fmt"
@@ -56,16 +55,16 @@ func ApiHandleEvent(c echo.Context) error {
 func (e *BrandCustomerConfirmed) Handle() error {
 	logs.Warning.Println("BrandCustomerConfirmed ative")
 	logs.Warning.Println(e)
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerConfirmed"
-	bc.CustNo = e.CustNo
-	err := bc.UpdateStatusAndCustNo()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerConfirmed"
+	// bc.CustNo = e.CustNo
+	// err := bc.UpdateStatusAndCustNo()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 	// WillDo:: SendCoupon
 	// err = fashion.SendCoupon(e.BrandCode, e.CustNo)
 	// if err != nil {
@@ -76,33 +75,38 @@ func (e *BrandCustomerConfirmed) Handle() error {
 
 func (e *BrandCustomerCreated) Handle() error {
 	logs.Warning.Println("BrandCustomerCreated ative")
+	logs.Warning.Println(e)
+
 	return nil
 }
 
 func (e *BrandCustomerFailed) Handle() error {
 	logs.Warning.Println("BrandCustomerFailed ative")
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerFailed"
-	err := bc.UpdateStatus()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	logs.Warning.Println(e)
+
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerFailed"
+	// err := bc.UpdateStatus()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 	return nil
 }
 
 func (e *BrandCustomerDuplicated) Handle() error {
 	logs.Warning.Println("BrandCustomerDuplicated ative")
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerDuplicated"
-	err := bc.UpdateStatus()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	logs.Warning.Println(e)
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerDuplicated"
+	// err := bc.UpdateStatus()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 	return nil
 }
