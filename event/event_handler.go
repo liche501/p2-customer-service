@@ -65,8 +65,7 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	bc.CustomerId = e.CustomerID
 	bc.Status = "BrandCustomerConfirmed"
 	bc.CustNo = e.CustNo
-	err := bc.UpdateStatusAndCustNo()
-	if err != nil {
+	if err := bc.UpdateStatusAndCustNo(); err != nil {
 		logs.Error.Println(err)
 		return err
 	}
@@ -89,15 +88,15 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	// 	logs.Error.Println(err)
 	// }
 
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerCreated"
-	err := bc.UpdateStatus()
-	if err != nil {
+	bc2 := model.BrandCustomer{}
+	bc2.BrandCode = e.BrandCode
+	bc2.CustomerId = e.CustomerID
+	bc2.Status = "BrandCustomerCreated"
+	if err := bc2.UpdateStatus(); err != nil {
 		logs.Error.Println(err)
 		return err
 	}
+
 	return nil
 }
 
