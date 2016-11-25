@@ -15,7 +15,7 @@
 	"Adapter": {
 		"CSL":{
 			"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
-			"CustomerInterfaceApi": "http://222.126.161.59:5002/api/v1/Customers"
+			"CustomerInterfaceApi": "http://custqa.elandcloud.com/api/v1/Customers"
 		},
 		"MH": {
 			"ServiceHost": "222.126.161.59",
