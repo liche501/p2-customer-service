@@ -70,54 +70,55 @@ type FashionBrandCustomerInfo struct {
 	BrandCustomer        BrandCustomer `xorm:"extends"`
 }
 
-func (u *FashionBrandCustomerInfo) Create() error {
+func (fbci *FashionBrandCustomerInfo) Create() error {
 	var mutex sync.Mutex
 	mutex.Lock()
 	defer mutex.Unlock()
 
+	//WillDo: this logic have to change
 	// return if exist
-	exist, err := FashionBrandCustomer{}.GetByWxOpenID(u.FashionBrandCustomer.BrandCode, u.FashionBrandCustomer.WxOpenID)
+	fashionBrandCustomer, err := FashionBrandCustomer{}.GetByWxOpenID(fbci.FashionBrandCustomer.BrandCode, fbci.FashionBrandCustomer.WxOpenID)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
-	if exist != nil {
+	if fashionBrandCustomer != nil {
 		return BrandCustomerAlreadyExistError
 	}
 
 	// check Customer exist
-	customer, err := Customer{}.GetByMobile(u.Customer.Mobile)
+	customer, err := Customer{}.GetByMobile(fbci.Customer.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 	if customer == nil {
-		if err := u.Customer.Create(); err != nil && err != CustomerNotExistError {
+		if err := fbci.Customer.Create(); err != nil && err != CustomerNotExistError {
 			return err
 		}
-		customer = &u.Customer
+		customer = &fbci.Customer
 	}
 
-	// create CustomerInfo
-	customerInfo, err := BrandCustomer{}.Get(u.FashionBrandCustomer.BrandCode, u.Mobile)
+	// create BrandCustomer
+	brandCustomer, err := BrandCustomer{}.Get(fbci.FashionBrandCustomer.BrandCode, fbci.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 
-	if customerInfo == nil {
-		customerInfo = &BrandCustomer{
+	if brandCustomer == nil {
+		brandCustomer = &BrandCustomer{
 			CustomerId: customer.Id,
-			Name:       u.FashionBrandCustomer.ReceiveName,
 			Mobile:     customer.Mobile,
-			WxOpenID:   u.FashionBrandCustomer.WxOpenID,
-			BrandCode:  u.FashionBrandCustomer.BrandCode,
+			WxOpenID:   fbci.FashionBrandCustomer.WxOpenID,
+			BrandCode:  fbci.FashionBrandCustomer.BrandCode,
+			Status:     "CustomerCreated",
 		}
-		if err := customerInfo.Save(); err != nil {
+		if err := brandCustomer.Save(); err != nil {
 			return err
 		}
 	}
 
 	// create FashionBrandCustomer
-	u.FashionBrandCustomer.CustomerId = customer.Id
-	affected, err := db.InsertOne(&u.FashionBrandCustomer)
+	fbci.FashionBrandCustomer.CustomerId = customer.Id
+	affected, err := db.InsertOne(&fbci.FashionBrandCustomer)
 	if err != nil {
 		return err
 	}

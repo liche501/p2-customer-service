@@ -34,17 +34,17 @@ func (BrandCustomer) TableName() string {
 	return "user_detail"
 }
 
-func (u *BrandCustomer) Save() error {
+func (bc *BrandCustomer) Save() error {
 	var mutex sync.Mutex
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	exist, err := BrandCustomer{}.Get(u.BrandCode, u.Mobile)
+	brandCustomer, err := BrandCustomer{}.Get(bc.BrandCode, bc.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
-	if exist != nil {
-		affected, err := db.Id(exist.Id).AllCols().Update(u)
+	if brandCustomer != nil {
+		affected, err := db.Id(brandCustomer.Id).AllCols().Update(bc)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (u *BrandCustomer) Save() error {
 		return nil
 	}
 
-	affected, err := db.InsertOne(u)
+	affected, err := db.InsertOne(bc)
 	if err != nil {
 		return err
 	}
@@ -65,34 +65,34 @@ func (u *BrandCustomer) Save() error {
 }
 
 func (BrandCustomer) Get(brandCode, mobile string) (*BrandCustomer, error) {
-	user := BrandCustomer{}
-	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&user)
+	brandCustomer := BrandCustomer{}
+	has, err := db.Where("mobile = ?", mobile).And("brand_code = ?", brandCode).Get(&brandCustomer)
 	if err != nil {
 		return nil, err
 	} else if !has {
 		return nil, CustomerNotExistError
 	}
-	return &user, nil
+	return &brandCustomer, nil
 }
 
 func (BrandCustomer) GetByWxOpenID(brandCode, wxOpenID string) (*BrandCustomer, error) {
-	user := BrandCustomer{}
-	has, err := db.Where("wx_open_id = ?", wxOpenID).And("brand_code = ?", brandCode).Get(&user)
+	brandCustomer := BrandCustomer{}
+	has, err := db.Where("wx_open_id = ?", wxOpenID).And("brand_code = ?", brandCode).Get(&brandCustomer)
 	if err != nil {
 		return nil, err
 	} else if !has {
 		return nil, CustomerNotExistError
 	}
-	return &user, nil
+	return &brandCustomer, nil
 }
 
 func (BrandCustomer) FindByMobile(mobile string) (customers []BrandCustomer, err error) {
 	err = db.Where("mobile = ?", mobile).Find(&customers)
-	return
+	return customers, err
 }
 
-func (u *BrandCustomer) UpdateHasFilled() error {
-	affected, err := db.Where("mobile = ?", u.Mobile).And("brand_code = ?", u.BrandCode).Cols("has_filled").Update(u)
+func (bc *BrandCustomer) UpdateHasFilled() error {
+	affected, err := db.Where("mobile = ?", bc.Mobile).And("brand_code = ?", bc.BrandCode).Cols("has_filled").Update(bc)
 	if err == nil && affected == 0 {
 		return errors.New("Affected rows : 0")
 	}
@@ -132,15 +132,15 @@ func (BrandCustomer) ChangeMobileWithOld(oldMobile, newMobile string) error {
 	return nil
 }
 
-func (u *BrandCustomer) UpdateStatusAndCustNo() error {
-	affected, err := db.Where("user_id = ?", u.CustomerId).And("brand_code = ?", u.BrandCode).Cols("status", "cust_no").Update(u)
+func (bc *BrandCustomer) UpdateStatusAndCustNo() error {
+	affected, err := db.Where("user_id = ?", bc.CustomerId).And("brand_code = ?", bc.BrandCode).Cols("status", "cust_no").Update(bc)
 	if err == nil && affected == 0 {
 		return errors.New("Affected rows : 0")
 	}
 	return err
 }
-func (u *BrandCustomer) UpdateStatus() error {
-	affected, err := db.Where("user_id = ?", u.CustomerId).And("brand_code = ?", u.BrandCode).Cols("status").Update(u)
+func (bc *BrandCustomer) UpdateStatus() error {
+	affected, err := db.Where("user_id = ?", bc.CustomerId).And("brand_code = ?", bc.BrandCode).Cols("status").Update(bc)
 	if err == nil && affected == 0 {
 		return errors.New("Affected rows : 0")
 	}

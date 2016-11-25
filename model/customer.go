@@ -41,21 +41,21 @@ func (Customer) GetByMobile(mobile string) (*Customer, error) {
 	return &c, nil
 }
 
-func (u *Customer) Create() error {
-	exist, err := Customer{}.GetByMobile(u.Mobile)
+func (c *Customer) Create() error {
+	customer, err := Customer{}.GetByMobile(c.Mobile)
 	if err != nil && err != CustomerNotExistError {
 		return err
 	}
 
-	if affected, err := db.InsertOne(u); err != nil {
+	if affected, err := db.InsertOne(c); err != nil {
 		return err
 	} else if affected == 0 {
 		return errors.New("Affected rows : 0")
 	}
 
-	// TODO:: This is illogic. Have to change this logic.
-	if exist != nil {
-		if affected, err := db.Id(exist.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(u.Id, 10)}); err != nil {
+	// WillDO:: This is illogic. Have to change this logic.
+	if customer != nil {
+		if affected, err := db.Id(customer.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(c.Id, 10)}); err != nil {
 			return err
 		} else if affected == 0 {
 			return errors.New("Affected rows : 0")
@@ -65,13 +65,13 @@ func (u *Customer) Create() error {
 }
 
 func (Customer) ChangeMobileWithID(id int64, mobile string) error {
-	exist, _ := Customer{}.GetByMobile(mobile)
-	if exist != nil && exist.Id == id {
+	customer, _ := Customer{}.GetByMobile(mobile)
+	if customer != nil && customer.Id == id {
 		return nil // do nothing
 	}
-	if exist != nil && exist.Id != id {
+	if customer != nil && customer.Id != id {
 		// TODO:: This is illogic. Have to change this logic.
-		if _, err := db.Id(exist.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(id, 10)}); err != nil {
+		if _, err := db.Id(customer.Id).Cols("mobile").Update(&Customer{Mobile: strconv.FormatInt(id, 10)}); err != nil {
 			return fmt.Errorf("Cannot change exist mobile: ", err)
 		}
 	}
@@ -91,15 +91,15 @@ func (Customer) ChangeMobileWithOld(oldMobile, newMobile string) error {
 		return nil
 	}
 
-	exist, err := Customer{}.GetByMobile(oldMobile)
+	customer, err := Customer{}.GetByMobile(oldMobile)
 	if err != nil {
 		return err
 	}
-	if exist == nil {
+	if customer == nil {
 		return errors.New("Affected rows : 0")
 	}
 
-	if err := (Customer{}.ChangeMobileWithID(exist.Id, newMobile)); err != nil {
+	if err := (Customer{}.ChangeMobileWithID(customer.Id, newMobile)); err != nil {
 		return err
 	}
 

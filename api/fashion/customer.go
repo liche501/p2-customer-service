@@ -66,14 +66,14 @@ func APIRegister(c echo.Context) error {
 	// }
 	logs.Debug.Println(brandCode, openId)
 
-	fashionBrandCustomerInfo := new(model.FashionBrandCustomerInfo)
-	fashionBrandCustomerInfo.Customer.Mobile = mobile
-	fashionBrandCustomerInfo.FashionBrandCustomer.BrandCode = brandCode
-	fashionBrandCustomerInfo.FashionBrandCustomer.WxOpenID = openId
-	logs.Debug.Println(fashionBrandCustomerInfo)
+	fbci := new(model.FashionBrandCustomerInfo)
+	fbci.Customer.Mobile = mobile
+	fbci.FashionBrandCustomer.BrandCode = brandCode
+	fbci.FashionBrandCustomer.WxOpenID = openId
+	logs.Debug.Println(fbci)
 
 	//customer regist
-	if err := fashionBrandCustomerInfo.Create(); err != nil {
+	if err := fbci.Create(); err != nil {
 		logs.Error.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -85,18 +85,17 @@ func APIRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	//sendEvent
+	//sendEvent BrandCustomerInitiated
 	et := new(event.EventSender)
 	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
 	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
 	obj := event.BrandCustomerInitiated{}
 	obj.CustomerID = brandCustomer.CustomerId
-	obj.Telephone = mobile
+	obj.Telephone = brandCustomer.Mobile
 	obj.Password = "123456"
-	obj.BrandCode = brandCode
-	obj.WxOpenID = openId
-	// var payload interface{}
-	c.Bind(&obj)
+	obj.BrandCode = brandCustomer.BrandCode
+	obj.WxOpenID = brandCustomer.WxOpenID
+
 	err = et.SendEvent("marketing", "BrandCustomerInitiated", obj)
 	if err != nil {
 		logs.Error.Println(err)
@@ -104,12 +103,9 @@ func APIRegister(c echo.Context) error {
 	}
 
 	//UpdateStatus BrandCustomerInitiated
-	bc := model.BrandCustomer{}
-	bc.BrandCode = brandCode
-	bc.CustomerId = 1 //e.CustomerID
-	bc.Status = "BrandCustomerInitiated"
-	err = bc.UpdateStatus()
-	if err != nil {
+	brandCustomer.Status = "BrandCustomerInitiated"
+
+	if err := brandCustomer.UpdateStatus(); err != nil {
 		logs.Error.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
