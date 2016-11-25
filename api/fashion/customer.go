@@ -169,7 +169,8 @@ func APIBrandCustomerStatus(c echo.Context) error {
 		return c.String(http.StatusOK, "data:nouser\n\nOtherError")
 
 	}
-	if len(fbci.CustNo) > 0 && fbci.Status() == "BrandCustomerCreated" {
+	logs.Warning.Println(fbci.BrandCustomer.CustNo, " ", fbci.Status())
+	if len(fbci.BrandCustomer.CustNo) > 0 && fbci.Status() == "BrandCustomerCreated" {
 		return c.String(http.StatusOK, "data:nouser\n\nexist")
 	}
 	return c.String(http.StatusOK, "data:nouser\n\n")
