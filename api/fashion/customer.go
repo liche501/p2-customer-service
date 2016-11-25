@@ -103,7 +103,6 @@ func APIRegister(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	logs.Debug.Println("1111")
 	//UpdateStatus BrandCustomerInitiated
 	bc := model.BrandCustomer{}
 	bc.BrandCode = brandCode
@@ -114,6 +113,7 @@ func APIRegister(c echo.Context) error {
 		logs.Error.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
+	logs.Succ.Println("BrandCustomerInitiated is send")
 
 	return c.JSON(http.StatusOK, APIResult{Success: true})
 

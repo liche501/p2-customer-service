@@ -63,16 +63,16 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	// 	logs.Error.Println(err)
 	// }
 
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerConfirmed"
-	bc.CustNo = e.CustNo
-	err := bc.UpdateStatusAndCustNo()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerConfirmed"
+	// bc.CustNo = e.CustNo
+	// err := bc.UpdateStatusAndCustNo()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 
 	//sendEvent BrandCustomerCreated
 	brandCustomerCreated := BrandCustomerCreated{}
@@ -91,15 +91,15 @@ func (e *BrandCustomerCreated) Handle() error {
 
 	//WillDo:: SendCoupon from wcs
 
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerCreated"
-	err := bc.UpdateStatus()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerCreated"
+	// err := bc.UpdateStatus()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 	return nil
 }
 
@@ -107,15 +107,15 @@ func (e *BrandCustomerFailed) Handle() error {
 	logs.Warning.Println("BrandCustomerFailed ative")
 	logs.Warning.Println(e)
 
-	bc := model.BrandCustomer{}
-	bc.BrandCode = e.BrandCode
-	bc.CustomerId = e.CustomerID
-	bc.Status = "BrandCustomerFailed"
-	err := bc.UpdateStatus()
-	if err != nil {
-		logs.Error.Println(err)
-		return err
-	}
+	// bc := model.BrandCustomer{}
+	// bc.BrandCode = e.BrandCode
+	// bc.CustomerId = e.CustomerID
+	// bc.Status = "BrandCustomerFailed"
+	// err := bc.UpdateStatus()
+	// if err != nil {
+	// 	logs.Error.Println(err)
+	// 	return err
+	// }
 	return nil
 }
 
