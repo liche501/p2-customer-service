@@ -3,6 +3,7 @@ package model
 import (
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
@@ -26,6 +27,9 @@ func InitDB(dialect, conn string) error {
 	isDebug := os.Getenv("WXSHOPDEBUG")
 	if len(isDebug) > 0 {
 		db.ShowSQL(true)
+		// db.ShowExecTime(true)
+		// db.Logger().SetLevel(core.LOG_WARNING)
+		db.TZLocation, _ = time.LoadLocation("Asia/Shanghai")
 	}
 
 	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(BrandCustomer), new(RetailBrandCustomer), new(Sms))

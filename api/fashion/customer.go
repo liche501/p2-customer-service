@@ -119,14 +119,14 @@ func APILogin(c echo.Context) error {
 	if openId == "" || brandCode == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, 10012)
 	}
-	logs.Warning.Println(brandCode, openId)
+	logs.Debug.Println(brandCode, openId)
 
 	fbci, err := model.FashionBrandCustomerInfo{}.GetSuccessUserByWxOpenID(brandCode, openId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10013)
 	}
 	if fbci == nil {
-		c.JSON(http.StatusOK, APIResult{Success: false})
+		return c.JSON(http.StatusOK, APIResult{Success: false, Error: APIError{Code: 200, Message: "customer not exist"}})
 	}
 
 	jsonWebToken, err := extends.AuthHandler(brandCode, openId, fbci.Customer.Mobile, fbci.FashionBrandCustomer.CustNo)

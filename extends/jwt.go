@@ -2,14 +2,15 @@ package extends
 
 import (
 	"best/p2-customer-service/logs"
+	"strings"
 
 	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 var privKey []byte
@@ -40,52 +41,46 @@ func AuthHandler(brandCode, openId, mobile, custNo string) (string, error) {
 		custNo,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 1172).Unix(),
-			Issuer:    "liche",
 		},
 	}
-
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	jsonWebToken, err := jwtToken.SignedString(privKey)
+	jsonWebToken, err := jwtToken.SignedString([]byte("secret"))
 	if err != nil {
 		logs.Error.Println("create jwtToken: ", err)
-		return "", echo.NewHTTPError(http.StatusInternalServerError, 20002)
+		return "", err
 	}
 	return jsonWebToken, nil
 }
 
-func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func JWTMiddleware() echo.MiddlewareFunc {
+	return middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte("secret"),
+		Claims:     &AuthClaims{},
+		Skipper: func(c echo.Context) bool {
+			switch {
+			case strings.HasPrefix(c.Path(), "/ping"):
+				return true
+			case strings.HasPrefix(c.Path(), "/skip"):
+				return true
+			case strings.HasPrefix(c.Path(), "/api/va/fashion/user/check_mobile"):
+				return true
+			case strings.HasPrefix(c.Path(), "/api/v1/common"):
+				return true
+			}
+			return false
+		},
+	})
+}
+
+func JWTMiddlewareDataFormat(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-
-		jwtValue := c.Request().Header.Get("Authorization")
-
-		if len(jwtValue) == 0 || jwtValue == "null" {
-			logs.Warning.Println("jwt_token is empty")
-			return echo.NewHTTPError(http.StatusForbidden, "20000")
+		// logs.Warning.Println(c.Get("user"))
+		if c.Get("user") != nil {
+			user := c.Get("user").(*jwt.Token)
+			claims := user.Claims.(*AuthClaims)
+			c.Set("user", claims)
 		}
-		var defaultKeyFunc jwt.Keyfunc = func(*jwt.Token) (interface{}, error) {
-			return privKey, nil
-		}
-		jsonWebTokenParsed, err := jwt.ParseWithClaims(jwtValue, &AuthClaims{}, defaultKeyFunc)
-		logs.Debug.Println("jsonWebTokenParsed.Valid==", jsonWebTokenParsed.Valid)
-		if err != nil || !jsonWebTokenParsed.Valid {
-			return echo.NewHTTPError(http.StatusForbidden, "20001")
-
-		}
-		ac := jsonWebTokenParsed.Claims.(*AuthClaims)
-		brandCode := ac.BrandCode
-		openId := ac.OpenId
-		mobile := ac.Mobile
-		custNo := ac.CustNo
-		logs.Debug.Printf("brandCode:%v openId:%v mobile:%v", brandCode, openId, mobile)
-		c.Set("brandCodeWithToken", brandCode)
-		c.Set("openIdWithToken", openId)
-		c.Set("mobileWithToken", mobile)
-		c.Set("custNoWithToken", custNo)
-
-		c.Set("user", ac)
-		// c.Get("user").(*AuthClaims).OpenId
-
 		return next(c)
 	}
 }

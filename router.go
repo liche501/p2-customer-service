@@ -15,8 +15,6 @@ import (
 )
 
 func RouterInit() {
-	// Login route
-	e.POST("/createtoken", CreateToken)
 	// Unauthenticated route
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "accessible")
@@ -24,16 +22,17 @@ func RouterInit() {
 	e.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "pong")
 	})
-	e.GET("/success", func(c echo.Context) error {
+	skip := e.Group("/skip")
+	skip.GET("/success", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: "aaaaaaa"})
 	})
-	e.GET("/error", func(c echo.Context) error {
+	skip.GET("/error", func(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, 10003)
 	})
-	e.GET("/error2", func(c echo.Context) error {
+	skip.GET("/error2", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 400, Message: "StatusBadRequest"}})
 	})
-	e.GET("/event/:eventType", func(c echo.Context) error {
+	skip.GET("/event/:eventType", func(c echo.Context) error {
 		aa := new(event.EventSender)
 		// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
 		aa.EventBrokerUrl = "http://staging.p2shop.cn:50110"
@@ -45,18 +44,21 @@ func RouterInit() {
 		}
 		return c.JSON(http.StatusOK, APIResult{Success: true})
 	})
-	e.GET("/token", func(c echo.Context) error {
+	skip.GET("/token", func(c echo.Context) error {
+		logs.Debug.Println("token start")
+
 		token, err := extends.AuthHandler("rc", "oYiR6wTz6anr5KpiRH-mRcpvvLPc", "13691194223", "0001852359")
-		if err == nil {
+		if err != nil {
 			return err
 		}
+		logs.Debug.Println(token)
 		return c.JSON(http.StatusOK, APIResult{Success: true, Result: token})
 	})
 	t := e.Group("/jwt")
-	t.Use(extends.JWTMiddleware)
+	// t.Use(extends.JWTMiddleware)
 	t.GET("", func(c echo.Context) error {
-
-		return c.String(http.StatusOK, "Welcome")
+		openId := c.Get("user").(*extends.AuthClaims).OpenId
+		return c.String(http.StatusOK, "Welcome "+openId)
 	})
 
 	api := e.Group("/api")
@@ -80,7 +82,6 @@ func RouterInit() {
 	a.GET("/set_auth", demo)
 
 	fa := v1.Group("/fashion")
-	fa.Use(extends.JWTMiddleware) //********** important check JWT prefix /fashion  *****
 	//User
 	user := fa.Group("/user")
 
