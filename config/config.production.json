@@ -1,38 +1,33 @@
 {
 	"DB": {
-		"Conn": "elanduser:Eland123@tcp(rm-uf697cmu717ius9i3.mysql.rds.aliyuncs.com:3306)/wxshop?charset=utf8&parseTime=True&loc=UTC"
+		"Conn": "root:aabb1122@tcp(139.196.228.246:3307)/customer_service?charset=utf8&parseTime=True&loc=UTC"
 	},
-	"Mongo": {
-		"Conn": "mongodb://root:eland123@139.196.177.202:3717,139.196.177.202:3718/admin?replicaSet=mgset-1110705"
-	},
-	"Contents": {
-		"ServiceHost": "nginx",
-		"Port": "81",
-		"CouponApiPrefix": "coupon/api/v2/CouponContents"
+	"Coupon": {
+		"Contents": {
+			"ServiceHost": "139.196.228.246",
+			"Port": "5001",
+			"CouponApiPrefix": "api/v2/CouponContents"
+		},
+		"Marketing": {
+			"EventCoupon": "http://139.196.228.246:40100"
+		}
 	},
 	"Adapter": {
-		"CslWebService": "http://ewifprd.accurate9.com/CustomerServiceWS.asmx",
-		"CustomerInterfaceApi": "http://139.224.20.10:5002/api/v1/Customers"
-	},
-	"TaskQueue": {
-		"Broker": "redis://Eland123@092c45b530344812.m.cnsha.kvstore.aliyuncs.com:6379"
+		"CSL":{
+			"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
+			"CustomerInterfaceApi": "http://custqa.elandcloud.com/api/v1/Customers"
+		},
+		"MH": {
+			"ServiceHost": "222.126.161.59",
+			"Port": "8093",
+			"MemberApiPrefix": "ws_member.asmx"
+		},
+		"EventBrokerURL":"http://staging.p2shop.cn:50110"
 	},
 	"CaptchaService":{
 		"ServiceHost": "139.196.228.246",
 		"Port": "9094",
 		"ApiPrefix": "captcha"
-	},
-	"MhService": {
-		"ServiceHost": "222.126.161.47",
-		"Port": "8093",
-		"MemberApiPrefix": "ws_member.asmx"
-	},
-	"FrontDomain": {
-		"Fashion": "http://fashion-wxshop.p2shop.cn",
-		"RC": "http://fashion-wxshop.p2shop.cn"
-	},
-	"Marketing": {
-		"EventCoupon": "https://gateway.p2shop.cn/event-coupon-service"
 	}
 }
   
