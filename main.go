@@ -35,6 +35,7 @@ func main() {
 	e.Use(extends.JWTMiddlewareDataFormat)
 	e.HTTPErrorHandler = JSONHTTPErrorHandler
 
+	RouterDemoInit()
 	RouterInit()
 	config.InitConfig()
 	model.InitDB("mysql", config.Config.DB.Conn)

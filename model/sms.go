@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// `xorm:"index(IDX_SMS)"`
 type Sms struct {
 	BrandCode string
 	Mobile    string `xorm:"index"`

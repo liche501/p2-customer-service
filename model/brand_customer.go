@@ -7,12 +7,13 @@ import (
 	"time"
 )
 
+//Id,CustomerId,WxOpenID,CustNo,Status
 // TODO:: WxOpenID, CustNo 로직 검증(jang.jaehue)
 type BrandCustomer struct {
 	Id            int64
 	CustomerId    int64 `xorm:"'user_id'"`
 	Name          string
-	Mobile        string `xorm:"index"`
+	Mobile        string
 	WxOpenID      string `xorm:"'wx_open_id'"`
 	CustNo        string
 	BrandCode     string

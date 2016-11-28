@@ -39,7 +39,6 @@ func APICheckMobileAvailableForRegister(c echo.Context) error {
 	return c.JSON(http.StatusOK, APIResult{Error: APIError{Code: 20007, Message: "Mobile already registered"}})
 }
 
-// curl -X POST -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJicmFuZENvZGUiOiJyYyIsIm9wZW5JZCI6Im9ZaVI2d1R6NmFucjVLcGlSSC1tUmNwdnZMUGMiLCJtb2JpbGUiOiIxMzY5MTE5NDIyMyIsImN1c3RObyI6IjAwMDE4NTIzNTkiLCJleHAiOjE0ODAwNjQ2NDIsImlzcyI6ImxpY2hlIn0.huxuvLITetwHzdpZHX-T_sfZe0rEeMM_2DOnugdUjRo" -H "Cache-Control: no-cache" -H "Postman-Token: 28bf6f4d-9809-26a2-3229-4a177c8d29cf" "http://localhost:9000/api/v1/fashion/user/register?mobile=13691194223&verCode=1234"
 func APIRegister(c echo.Context) error {
 	mobile := c.QueryParam("mobile")
 	verCode := c.QueryParam("verCode")
