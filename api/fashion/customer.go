@@ -84,8 +84,8 @@ func APIRegister(c echo.Context) error {
 	}
 	//sendEvent BrandCustomerInitiated
 	et := new(event.EventSender)
-	// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
-	et.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+	// url := fmt.Sprintf("http://staging.p2shop.cn:50110/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+	et.EventBrokerUrl = config.Config.Adapter.EventBrokerURL
 	obj := event.BrandCustomerInitiated{}
 	obj.CustomerID = brandCustomer.CustomerId
 	obj.Telephone = brandCustomer.Mobile

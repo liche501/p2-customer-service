@@ -30,6 +30,7 @@ var Config = struct {
 			Port            string `json:"Port"`
 			MemberAPIPrefix string `json:"MemberApiPrefix"`
 		} `json:"MH"`
+		EventBrokerURL string `json:"EventBrokerURL"`
 	} `json:"Adapter"`
 	CaptchaService struct {
 		ServiceHost string `json:"ServiceHost"`

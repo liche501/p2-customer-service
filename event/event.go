@@ -19,6 +19,7 @@ var eventTypeMap = map[string]reflect.Type{
 	"BrandCustomerCreated":    reflect.TypeOf(BrandCustomerCreated{}),
 	"BrandCustomerFailed":     reflect.TypeOf(BrandCustomerFailed{}),
 	"BrandCustomerDuplicated": reflect.TypeOf(BrandCustomerDuplicated{}),
+	"SendCouponInitiated":     reflect.TypeOf(SendCouponInitiated{}),
 }
 
 type CustomerCreated struct {
@@ -60,4 +61,10 @@ type BrandCustomerDuplicated struct {
 	CustomerID int64     `json:"customerId"`
 	BrandCode  string    `json:"brandCode"`
 	CreatedAt  time.Time `json:"createdAt"`
+}
+
+type SendCouponInitiated struct {
+	BrandCode string    `json:"brandCode"`
+	CustNo    string    `json:"custNo"`
+	CreatedAt time.Time `json:"createdAt"`
 }

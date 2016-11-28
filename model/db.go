@@ -32,6 +32,6 @@ func InitDB(dialect, conn string) error {
 		db.TZLocation, _ = time.LoadLocation("Asia/Shanghai")
 	}
 
-	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(BrandCustomer), new(RetailBrandCustomer), new(Sms))
+	return db.Sync2(new(Customer), new(FashionBrandCustomer), new(BrandCustomer), new(Sms))
 
 }

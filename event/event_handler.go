@@ -71,22 +71,20 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	}
 
 	//SendCoupon
-
 	// if err := SendCoupon(e.BrandCode, e.CustNo); err != nil {
 	// 	logs.Error.Println(err)
 	// }
 
-	//sendEvent BrandCustomerCreated
-	// brandCustomerCreated := BrandCustomerCreated{}
-	// brandCustomerCreated.BrandCode = e.BrandCode
-	// brandCustomerCreated.CustNo = e.BrandCode
-	// brandCustomerCreated.CustomerID = e.CustomerID
-	// es := new(EventSender)
-	// es.EventBrokerUrl = "http://staging.p2shop.cn:50110"
-	// err := es.SendEvent("marketing", "BrandCustomerCreated", brandCustomerCreated)
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// }
+	//sendEvent SendCouponInitiated (crm and wcs)
+	sendCouponInitiated := SendCouponInitiated{}
+	sendCouponInitiated.BrandCode = e.BrandCode
+	sendCouponInitiated.CustNo = e.BrandCode
+	es := new(EventSender)
+	es.EventBrokerUrl = config.Config.Adapter.EventBrokerURL
+	err := es.SendEvent("marketing", "SendCouponInitiated", sendCouponInitiated)
+	if err != nil {
+		logs.Error.Println(err)
+	}
 
 	bc2 := model.BrandCustomer{}
 	bc2.BrandCode = e.BrandCode
@@ -120,15 +118,15 @@ func (e *BrandCustomerFailed) Handle() error {
 	logs.Warning.Println("BrandCustomerFailed ative")
 	logs.Warning.Println(e)
 
-	// bc := model.BrandCustomer{}
-	// bc.BrandCode = e.BrandCode
-	// bc.CustomerId = e.CustomerID
-	// bc.Status = "BrandCustomerFailed"
-	// err := bc.UpdateStatus()
-	// if err != nil {
-	// 	logs.Error.Println(err)
-	// 	return err
-	// }
+	bc := model.BrandCustomer{}
+	bc.BrandCode = e.BrandCode
+	bc.CustomerId = e.CustomerID
+	bc.Status = "BrandCustomerFailed"
+	err := bc.UpdateStatus()
+	if err != nil {
+		logs.Error.Println(err)
+		return err
+	}
 	return nil
 }
 

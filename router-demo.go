@@ -1,6 +1,7 @@
 package main
 
 import (
+	"best/p2-customer-service/config"
 	. "best/p2-customer-service/dto"
 	"best/p2-customer-service/event"
 	"best/p2-customer-service/extends"
@@ -30,8 +31,8 @@ func RouterDemoInit() {
 	})
 	skip.GET("/event/:eventType", func(c echo.Context) error {
 		aa := new(event.EventSender)
-		// url := fmt.Sprintf("/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
-		aa.EventBrokerUrl = "http://staging.p2shop.cn:50110"
+		// url := fmt.Sprintf("http://staging.p2shop.cn:50110/v1/streams/%v/events/%v", "marketing", "BrandCustomerInitiated")
+		aa.EventBrokerUrl = config.Config.Adapter.EventBrokerURL
 		var payload interface{}
 		c.Bind(&payload)
 		err := aa.SendEvent("marketing", "BrandCustomerInitiated", payload)

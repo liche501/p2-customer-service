@@ -21,7 +21,8 @@
 			"ServiceHost": "222.126.161.59",
 			"Port": "8093",
 			"MemberApiPrefix": "ws_member.asmx"
-		}
+		},
+		"EventBrokerURL":"http://staging.p2shop.cn:50110"
 	},
 	"CaptchaService":{
 		"ServiceHost": "139.196.228.246",
