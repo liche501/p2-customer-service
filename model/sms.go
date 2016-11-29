@@ -7,6 +7,7 @@ import (
 
 // `xorm:"index(IDX_SMS)"`
 type Sms struct {
+	Id        int64
 	BrandCode string
 	Mobile    string `xorm:"index"`
 	Type      string

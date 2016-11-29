@@ -13,11 +13,6 @@ type FashionBrandCustomer struct {
 	CustNo     string
 	WxOpenID   string `xorm:"'open_id'"`
 
-	ReceiveAddress   string `xorm:"'receiv_address'"`
-	ReceiveTelephone string `xorm:"'receiv_telephone'"`
-	ReceiveName      string `xorm:"'receiv_name'"`
-	ReceiveSize      string `xorm:"'receiv_size'"`
-
 	CreatedAt time.Time `xorm:"created 'in_date_time'"`
 	UpdatedAt time.Time `xorm:"updated 'modi_date_time'"`
 }
