@@ -41,6 +41,7 @@ type BrandCustomerConfirmed struct {
 	CustomerID int64     `json:"customerId"`
 	CustNo     string    `json:"custNo"`
 	BrandCode  string    `json:"brandCode"`
+	IsNewCust  string    `json:"isNewCust"`
 	CreatedAt  time.Time `json:"createdAt"`
 }
 

@@ -150,7 +150,7 @@ func (BrandCustomer) ChangeMobileWithOld(oldMobile, newMobile string) error {
 }
 
 func (bc *BrandCustomer) UpdateStatusAndCustNo() error {
-	affected, err := db.Where("user_id = ?", bc.CustomerId).And("brand_code = ?", bc.BrandCode).Cols("status", "cust_no").Update(bc)
+	affected, err := db.Where("user_id = ?", bc.CustomerId).And("brand_code = ?", bc.BrandCode).Cols("status", "cust_no", "is_new_cust").Update(bc)
 	if err == nil && affected == 0 {
 		return errors.New("Affected rows : 0")
 	}

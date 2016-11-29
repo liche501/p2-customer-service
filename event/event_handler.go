@@ -4,6 +4,7 @@ import (
 	"best/p2-customer-service/config"
 	"best/p2-customer-service/logs"
 	"best/p2-customer-service/model"
+	"strconv"
 	"strings"
 
 	"encoding/json"
@@ -65,6 +66,8 @@ func (e *BrandCustomerConfirmed) Handle() error {
 	bc.CustomerId = e.CustomerID
 	bc.Status = "BrandCustomerConfirmed"
 	bc.CustNo = e.CustNo
+	numIsNewCust, _ := strconv.ParseInt(e.IsNewCust, 10, 64)
+	bc.IsNewCust = numIsNewCust
 	if err := bc.UpdateStatusAndCustNo(); err != nil {
 		logs.Error.Println(err)
 		return err

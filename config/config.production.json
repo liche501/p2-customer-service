@@ -4,25 +4,25 @@
 	},
 	"Coupon": {
 		"Contents": {
-			"ServiceHost": "139.196.228.246",
-			"Port": "5001",
-			"CouponApiPrefix": "api/v2/CouponContents"
+			"ServiceHost": "nginx",
+			"Port": "81",
+			"CouponApiPrefix": "coupon/api/v2/CouponContents"
 		},
-		"Marketing": {
-			"EventCoupon": "http://139.196.228.246:40100"
+		"Marketing": {	   
+			"EventCoupon": "http://gateway.p2shop.cn/event-coupon-service"
 		}
 	},
 	"Adapter": {
 		"CSL":{
-			"CslWebService": "http://ewifqa.accurate9.com/CustomerServiceWS.asmx",
-			"CustomerInterfaceApi": "http://custqa.elandcloud.com/api/v1/Customers"
+			"CslWebService": "http://ewifprd.accurate9.com/CustomerServiceWS.asmx",
+			"CustomerInterfaceApi": "http://139.224.20.10:5002/api/v1/Customers"
 		},
 		"MH": {
 			"ServiceHost": "222.126.161.59",
 			"Port": "8093",
 			"MemberApiPrefix": "ws_member.asmx"
 		},
-		"EventBrokerURL":"http://staging.p2shop.cn:50110"
+		"EventBrokerURL":"https://gateway.p2shop.cn/event-broker"
 	},
 	"CaptchaService":{
 		"ServiceHost": "139.196.228.246",

@@ -9,7 +9,7 @@
 			"CouponApiPrefix": "api/v2/CouponContents"
 		},
 		"Marketing": {
-			"EventCoupon": "http://139.196.228.246:40100"
+			"EventCoupon": "http://staging.p2shop.cn:40100"
 		}
 	},
 	"Adapter": {
