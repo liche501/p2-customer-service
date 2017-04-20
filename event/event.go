@@ -46,10 +46,13 @@ type BrandCustomerConfirmed struct {
 }
 
 type BrandCustomerCreated struct {
-	CustomerID int64     `json:"customerId"`
-	BrandCode  string    `json:"brandCode"`
-	CustNo     string    `json:"custNo"`
-	CreatedAt  time.Time `json:"createdAt"`
+	CustomerID       int64     `json:"customerId"`
+	BrandCode        string    `json:"brandCode"`
+	CustNo           string    `json:"custNo"`
+	WxOpenID         string    `json:"openId"`
+	Mobile           string    `json:"mobile"`
+	RegisterDateTime time.Time `json:"registerDateTime"`
+	CreatedAt        time.Time `json:"createdAt"`
 }
 
 type BrandCustomerFailed struct {
